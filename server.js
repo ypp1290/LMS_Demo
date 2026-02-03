@@ -5,19 +5,64 @@ const pool = require("./db");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const path = require("path");
+const express = require('express');
+const path = require('path');
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// ================= STATIC FILE SERVING =================
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, "public")));
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Modern College LMS is running',
+    timestamp: new Date().toISOString()
+  });
+});
 
-// Alternative: If your frontend files are in a different directory
-// app.use(express.static(path.join(__dirname, "../public")));
-// app.use(express.static(path.join(__dirname, "../frontend")));
+// Serve main page
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Modern College LMS</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding: 50px;
+          background: #f5f5f5;
+        }
+        h1 { color: #1a237e; }
+        .status {
+          background: #4CAF50;
+          color: white;
+          padding: 10px;
+          border-radius: 5px;
+          margin: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>🎓 Modern College LMS</h1>
+      <div class="status">✅ Server is Running</div>
+      <p>Learning Management System</p>
+      <a href="/login.html">Go to Login</a>
+    </body>
+    </html>
+  `);
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📁 Serving static files from: ${path.join(__dirname, 'public')}`);
+});
 
 const JWT_SECRET = "mysecretkey"; // move to .env later
 
@@ -3205,4 +3250,5 @@ app.listen(PORT, () => {
   console.log(`   GET  /api/student-subjects`);
   console.log(`   POST /api/update-student-subjects`);
   console.log(`   GET  /api/health`);
+
 });
