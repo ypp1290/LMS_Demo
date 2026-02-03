@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Dashboard - Modern College</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ===== CSS VARIABLES FOR EASY THEME MANAGEMENT ===== */
+        :root {
+            /* Primary Colors */
+            --primary-bg: #f8f9fa;
+            --sidebar-bg: #2c3e50;
+            --header-bg: #34495e;
+            --card-bg: #ffffff;
+            
+            /* Text Colors */
+            --text-primary: #2c3e50;
+            --text-secondary: #5d6d7e;
+            --text-light: #ffffff;
+            
+            /* Accent Colors */
+            --accent-color: #3498db;
+            --border-color: #e0e0e0;
+            --hover-bg: #f5f5f5;
+            
+            /* Dark Theme Variables */
+            --dark-primary-bg: #121212;
+            --dark-sidebar-bg: #1a1a1a;
+            --dark-header-bg: #2d2d2d;
+            --dark-card-bg: #2d2d2d;
+            --dark-text-primary: #e0e0e0;
+            --dark-text-secondary: #b0b0b0;
+            --dark-border-color: #404040;
+            --dark-hover-bg: #3d3d3d;
+        }
+
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--primary-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-theme {
+            --primary-bg: var(--dark-primary-bg);
+            --sidebar-bg: var(--dark-sidebar-bg);
+            --header-bg: var(--dark-header-bg);
+            --card-bg: var(--dark-card-bg);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --border-color: var(--dark-border-color);
+            --hover-bg: var(--dark-hover-bg);
+        }
+
+        /* ===== SIDEBAR STYLES ===== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: var(--text-light);
+            padding: 20px 0;
+            transition: 0.3s ease;
+            overflow: hidden;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar ul li:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar ul li.active {
+            background: rgba(52, 152, 219, 0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar ul li i {
+            min-width: 24px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed span {
+            display: none;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .logo img {
+            width: 140px;
+            background: whitesmoke;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+            transform: scale(1.03);
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== HEADER STYLES ===== */
+        .header {
+            height: 70px;
+            background: var(--header-bg);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+        }
+
+        .header-left,
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .toggle-btn {
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .org-name {
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.3px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        /* ===== PROFILE DROPDOWN ===== */
+        .profile {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile i {
+            font-size: 32px;
+            color: #ecf0f1;
+            transition: transform 0.2s ease;
+        }
+
+        .profile i:hover {
+            transform: scale(1.1);
+        }
+
+        .dropdown {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            width: 260px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown.active {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown .info {
+            padding: 20px;
+            background: var(--hover-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown .info strong {
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .dropdown .info small {
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .dropdown ul {
+            list-style: none;
+        }
+
+        .dropdown ul li {
+            padding: 14px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown ul li:hover {
+            background: var(--hover-bg);
+        }
+
+        .dropdown ul li i {
+            width: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content {
+            flex: 1;
+            padding: 25px;
+            background: var(--primary-bg);
+            overflow-y: auto;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .content h2 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ===== SECTION CARDS FOR DASHBOARD ===== */
+        .section-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-card h3 i {
+            color: var(--accent-color);
+        }
+
+        .section-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* ===== STATISTICS STYLES ===== */
+        .stat-card {
+            background: linear-gradient(135deg, var(--accent-color), #2980b9);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .stat-card h3 {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stat-change.positive {
+            color: #2ecc71;
+        }
+
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 992px) {
+            .section-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                top: 0;
+                height: 100%;
+                z-index: 200;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.mobile-show {
+                left: 0;
+            }
+
+            .org-name {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .section-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .header-right {
+                gap: 10px;
+            }
+
+            .section-card {
+                padding: 20px;
+            }
+
+            .content h2 {
+                font-size: 24px;
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .locked {
+            display: none;
+        }
+
+        /* ===== THEME TOGGLE BUTTON ===== */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== MOBILE OVERLAY ===== */
+        .mobile-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+        }
+
+        .mobile-sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .status-pending {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f39c12;
+        }
+        
+        /* ===== TEACHER PROFILE INFO ===== */
+        .teacher-profile-info {
+            margin-top: 20px;
+        }
+        
+        .teacher-profile-info p {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .teacher-profile-info strong {
+            color: var(--text-primary);
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+        }
+
+        .modal-content {
+            padding: 25px;
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #7f8c8d;
+        }
+
+        .btn-secondary:hover {
+            background: #6c7b7d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #219653;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 10px 0;
+        }
+
+        /* ===== TABLE STYLES ===== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th {
+            padding: 12px;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .data-table td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #2980b9;
+        }
+
+        .edit-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #d68910;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar" id="sidebar">
+    <div class="logo">
+        <img src="logo-college.webp" alt="College Logo">
+    </div>
+
+    <ul>
+        <li class="active" onclick="showDashboard()"><i class="fa-solid fa-house"></i> <span>Dashboard</span></li>
+        <li onclick="showMyClasses()"><i class="fa-solid fa-chalkboard-user"></i> <span>My Classes</span></li>
+        <li onclick="showSchedule()"><i class="fa-solid fa-calendar-days"></i> <span>Schedule</span></li>
+        <li onclick="showStudents()"><i class="fa-solid fa-users"></i> <span>Students</span></li>
+        <li onclick="showAttendance()"><i class="fa-solid fa-clipboard-check"></i> <span>Attendance</span></li>
+        <li onclick="showResources()"><i class="fa-solid fa-book"></i> <span>Resources</span></li>
+        <li onclick="showAnnouncements()"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></li>
+    </ul>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="hideMobileSidebar()"></div>
+
+<!-- Create Announcement Modal -->
+<div class="modal-overlay" id="announcementModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-bullhorn"></i> Create Announcement</h3>
+            <button class="modal-close" onclick="closeAnnouncementModal()">&times;</button>
+        </div>
+        <div class="modal-content">
+            <div class="form-group">
+                <label for="announcementClass">Select Class</label>
+                <select id="announcementClass" class="form-control">
+                    <option value="">Select a class</option>
+                    <!-- Classes will be loaded dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="announcementTitle">Title</label>
+                <input type="text" id="announcementTitle" class="form-control" placeholder="Enter announcement title">
+            </div>
+            <div class="form-group">
+                <label for="announcementContent">Content</label>
+                <textarea id="announcementContent" class="form-control" rows="5" placeholder="Enter announcement content"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="announcementType">Type</label>
+                <select id="announcementType" class="form-control">
+                    <option value="general">General</option>
+                    <option value="important">Important</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeAnnouncementModal()">Cancel</button>
+                <button class="btn btn-success" onclick="createAnnouncement()">Create Announcement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Material Modal -->
+<div class="modal-overlay" id="materialModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-upload"></i> Upload Study Material</h3>
+            <button class="modal-close" onclick="closeMaterialModal()">&times;</button>
+        </div>
+        <div class="modal-content">
+            <div class="form-group">
+                <label for="materialClass">Select Class</label>
+                <select id="materialClass" class="form-control" onchange="loadClassSubjects()">
+                    <option value="">Select a class</option>
+                    <!-- Classes will be loaded dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="materialSubject">Subject</label>
+                <select id="materialSubject" class="form-control">
+                    <option value="">Select subject</option>
+                    <!-- Subjects will be loaded dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="materialTitle">Title</label>
+                <input type="text" id="materialTitle" class="form-control" placeholder="Enter material title">
+            </div>
+            <div class="form-group">
+                <label for="materialDescription">Description</label>
+                <textarea id="materialDescription" class="form-control" rows="3" placeholder="Enter description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="materialType">Material Type</label>
+                <select id="materialType" class="form-control">
+                    <option value="document">Document</option>
+                    <option value="presentation">Presentation</option>
+                    <option value="video">Video</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="notes">Notes</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="materialFile">File URL/Link</label>
+                <input type="text" id="materialFile" class="form-control" placeholder="Enter file URL or Google Drive link">
+            </div>
+            <div class="form-group">
+                <label for="materialFileName">File Name</label>
+                <input type="text" id="materialFileName" class="form-control" placeholder="Enter file name">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeMaterialModal()">Cancel</button>
+                <button class="btn btn-success" onclick="uploadStudyMaterial()">Upload Material</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main locked" id="secureApp">
+    <div class="header">
+        <div class="header-left">
+            <i class="fa-solid fa-bars toggle-btn" onclick="toggleSidebar()"></i>
+            <i class="fa-solid fa-expand toggle-btn" onclick="toggleFullScreen()"></i>
+        </div>
+
+        <div class="header-right">
+            <!-- School name kept exactly as requested -->
+            <span class="org-name">Modern College of Arts, Science and Commerce, Warje Pune – 411 058</span>
+            
+            <!-- Theme Toggle Button -->
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+
+            <div class="profile" onclick="toggleDropdown()">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="dropdown" id="dropdown">
+                    <div class="info">
+                        <strong id="teacherNameDisplay">Loading...</strong><br>
+                        <small id="teacherEmailDisplay"></small><br>
+                        <small id="teacherDeptDisplay"></small><br>
+                        <small>Academic Year: 2025–26</small>
+                    </div>
+                    <ul>
+                        <li onclick="showProfile()"><i class="fa-solid fa-user"></i> My Profile</li>
+                        <li onclick="changePassword()"><i class="fa-solid fa-key"></i> Change Password</li>
+                        <li><i class="fa-solid fa-bell"></i> Notifications</li>
+                        <li onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Dashboard Content -->
+        <div class="dashboard-content" id="dashboardContent">
+            <h2 id="dashboardTitle">Teacher Dashboard</h2>
+            <p id="dashboardSubtitle">Welcome to your teaching portal. Manage your classes, schedule, students, and teaching materials.</p>
+            
+            <!-- Quick Stats -->
+            <div class="section-container" id="statsContainer">
+                <!-- Stats will be dynamically loaded -->
+            </div>
+
+            <!-- Teacher Features -->
+            <div class="section-container" style="margin-top: 30px;" id="featuresContainer">
+                <!-- Features will be dynamically loaded -->
+            </div>
+
+            <!-- Upcoming Events -->
+            <div style="margin-top: 40px;" id="eventsContainer">
+                <!-- Events will be dynamically loaded -->
+            </div>
+        </div>
+
+        <!-- Other Sections (Initially Hidden) -->
+        <div id="otherSections" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+// ================= AUTHENTICATION CHECK =================
+const teacherToken = localStorage.getItem("teacherToken");
+
+if (!teacherToken) {
+    window.location.href = "login.html";
+}
+
+// ================= TEACHER DATA =================
+let teacherData = {
+    name: localStorage.getItem("teacherName") || "Teacher",
+    email: localStorage.getItem("teacherEmail") || "",
+    code: localStorage.getItem("teacherCode") || "",
+    department: localStorage.getItem("teacherDepartment") || "Not Assigned",
+    id: localStorage.getItem("teacherId") || "",
+    subjects: localStorage.getItem("teacherSubjects") || "Not specified"
+};
+
+// ================= FETCH TEACHER PROFILE =================
+async function fetchTeacherProfile() {
+    try {
+        const response = await fetch("http://localhost:5000/api/teacher-profile", {
+            headers: {
+                "Authorization": "Bearer " + teacherToken
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.teacher) {
+                // Update teacher data from server
+                teacherData = {
+                    ...teacherData,
+                    ...data.teacher,
+                    all_subjects: data.teacher.all_subjects || []
+                };
+                
+                // Store in localStorage for future use
+                Object.keys(data.teacher).forEach(key => {
+                    if (key !== 'all_subjects') {
+                        localStorage.setItem(`teacher${key.charAt(0).toUpperCase() + key.slice(1)}`, data.teacher[key]);
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching teacher profile:", error);
+    }
+}
+
+// ================= FETCH TEACHER CLASSES =================
+async function fetchTeacherClasses() {
+    try {
+        const response = await fetch("http://localhost:5000/api/teacher-classes", {
+            headers: {
+                "Authorization": "Bearer " + teacherToken
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                return data.classes || [];
+            }
+        }
+        return [];
+    } catch (error) {
+        console.error("Error fetching teacher classes:", error);
+        return [];
+    }
+}
+
+// ================= FETCH TEACHER SUBJECTS =================
+async function fetchTeacherSubjects() {
+    try {
+        const response = await fetch("http://localhost:5000/api/teacher-subjects", {
+            headers: {
+                "Authorization": "Bearer " + teacherToken
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                return data.subjects || [];
+            }
+        }
+        return [];
+    } catch (error) {
+        console.error("Error fetching teacher subjects:", error);
+        return [];
+    }
+}
+
+// ================= FETCH ALL SUBJECTS =================
+async function fetchAllSubjects() {
+    try {
+        const response = await fetch("http://localhost:5000/api/subjects", {
+            headers: {
+                "Authorization": "Bearer " + teacherToken
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                return data.subjects || [];
+            }
+        }
+        return [];
+    } catch (error) {
+        console.error("Error fetching all subjects:", error);
+        return [];
+    }
+}
+
+// ================= INITIALIZE PAGE =================
+async function initializePage() {
+    // Fetch teacher profile data
+    await fetchTeacherProfile();
+    
+    // Update teacher info
+    document.getElementById('teacherNameDisplay').textContent = `Welcome, ${teacherData.name}`;
+    document.getElementById('teacherEmailDisplay').textContent = teacherData.email;
+    document.getElementById('teacherDeptDisplay').textContent = `${teacherData.code} | ${teacherData.department}`;
+    
+    // Fetch additional data
+    const classes = await fetchTeacherClasses();
+    const subjects = await fetchTeacherSubjects();
+    
+    // Unlock the app
+    document.getElementById("secureApp").classList.remove("locked");
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    const themeIcon = document.getElementById('themeIcon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeIcon.className = 'fa-solid fa-sun';
+    } else {
+        themeIcon.className = 'fa-solid fa-moon';
+    }
+    
+    // Initialize dashboard with dynamic data
+    showDashboard(classes, subjects);
+}
+
+// ================= NAVIGATION FUNCTIONS =================
+async function showDashboard(classesData = null, subjectsData = null) {
+    // Fetch data if not provided
+    const classes = classesData || await fetchTeacherClasses();
+    const subjects = subjectsData || await fetchTeacherSubjects();
+    
+    document.getElementById('dashboardContent').style.display = 'block';
+    document.getElementById('otherSections').style.display = 'none';
+    updateSidebarActive('dashboard');
+    document.getElementById('dashboardTitle').textContent = `Welcome, ${teacherData.name}`;
+    document.getElementById('dashboardSubtitle').textContent = `${teacherData.department} Department | Teacher Code: ${teacherData.code}`;
+    
+    // Update stats container
+    const statsContainer = document.getElementById('statsContainer');
+    statsContainer.innerHTML = `
+        <div class="stat-card">
+            <h3><i class="fa-solid fa-chalkboard"></i> Total Classes</h3>
+            <div class="stat-number">${classes.length}</div>
+            <div class="stat-change positive">${classes.length > 0 ? 'Active' : 'No classes assigned'}</div>
+        </div>
+        
+        <div class="stat-card">
+            <h3><i class="fa-solid fa-users"></i> Total Students</h3>
+            <div class="stat-number">${classes.reduce((total, cls) => total + (cls.student_count || 0), 0)}</div>
+            <div class="stat-change positive">${classes.length > 0 ? 'Enrolled students' : 'No students'}</div>
+        </div>
+        
+        <div class="stat-card">
+            <h3><i class="fa-solid fa-book"></i> Teaching Subjects</h3>
+            <div class="stat-number">${subjects.length}</div>
+            <div class="stat-change">Unique subjects</div>
+        </div>
+        
+        <div class="stat-card">
+            <h3><i class="fa-solid fa-tasks"></i> Pending Tasks</h3>
+            <div class="stat-number">${Math.floor(classes.length * 1.5)}</div>
+            <div class="stat-change negative">Due: This week</div>
+        </div>
+    `;
+    
+    // Update features container
+    const featuresContainer = document.getElementById('featuresContainer');
+    const today = new Date();
+    const todayClasses = classes.filter(cls => {
+        // Simple logic - you can replace this with actual schedule logic
+        const classDay = cls.class_name?.charAt(0) || 'M';
+        const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        return days[today.getDay()] === classDay;
+    }).length;
+
+    featuresContainer.innerHTML = `
+        <div class="section-card" onclick="showMyClasses()">
+            <h3><i class="fa-solid fa-chalkboard-teacher"></i> My Classes</h3>
+            <p>View and manage all your assigned classes, course materials, and teaching schedule.</p>
+            <div class="status-badge status-active">${classes.length} Classes</div>
+        </div>
+        
+        <div class="section-card" onclick="showSchedule()">
+            <h3><i class="fa-solid fa-calendar-alt"></i> Class Schedule</h3>
+            <p>Check your daily/weekly timetable, upcoming classes, and academic calendar.</p>
+            <div class="status-badge status-active">Today: ${todayClasses} Classes</div>
+        </div>
+        
+        <div class="section-card" onclick="showStudents()">
+            <h3><i class="fa-solid fa-user-graduate"></i> Student Management</h3>
+            <p>View student lists, manage attendance, track performance, and update grades.</p>
+            <div class="status-badge status-active">${classes.reduce((total, cls) => total + (cls.student_count || 0), 0)} Students</div>
+        </div>
+        
+        <div class="section-card" onclick="showAttendance()">
+            <h3><i class="fa-solid fa-clipboard-list"></i> Attendance System</h3>
+            <p>Take daily attendance, view reports, and manage student attendance records.</p>
+            <div class="status-badge status-pending">Mark Today's Attendance</div>
+        </div>
+        
+        <div class="section-card" onclick="showResources()">
+            <h3><i class="fa-solid fa-folder-open"></i> Teaching Resources</h3>
+            <p>Access and upload course materials, assignments, question papers, and study resources.</p>
+            <div class="status-badge status-active">Manage Resources</div>
+        </div>
+        
+        <div class="section-card" onclick="showAnnouncements()">
+            <h3><i class="fa-solid fa-bullhorn"></i> Announcements</h3>
+            <p>Create and manage announcements for your classes and students.</p>
+            <div class="status-badge status-active">Post Announcements</div>
+        </div>
+    `;
+    
+    // Update events container
+    const eventsContainer = document.getElementById('eventsContainer');
+    eventsContainer.innerHTML = `
+        <h3><i class="fa-solid fa-bell"></i> Upcoming Events & Notices</h3>
+        <div class="section-card" style="margin-top: 15px;">
+            <h4><i class="fa-solid fa-calendar-day" style="color: #e74c3c;"></i> Today's Schedule</h4>
+            <div id="todaySchedule">
+                <div class="loading-text">
+                    <div class="spinner"></div>
+                    Loading today's schedule...
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Load today's schedule
+    loadTodaySchedule(classes);
+}
+
+async function loadTodaySchedule(classes) {
+    const todaySchedule = document.getElementById('todaySchedule');
+    
+    if (classes.length === 0) {
+        todaySchedule.innerHTML = `
+            <ul style="margin-top: 10px; padding-left: 20px; color: var(--text-secondary);">
+                <li style="margin-bottom: 8px;">No classes scheduled for today</li>
+            </ul>
+        `;
+        return;
+    }
+    
+    // Simple schedule - you can enhance this with actual timetable data
+    const schedule = [
+        { time: "10:00 AM", class: classes[0]?.class_name || "Class 1", subject: teacherData.all_subjects?.[0] || "Subject 1" },
+        { time: "11:30 AM", class: classes[1]?.class_name || "Class 2", subject: teacherData.all_subjects?.[1] || "Subject 2" },
+        { time: "02:00 PM", class: classes[2]?.class_name || "Class 3", subject: teacherData.all_subjects?.[2] || "Subject 3" }
+    ];
+    
+    let scheduleHtml = '<ul style="margin-top: 10px; padding-left: 20px; color: var(--text-secondary);">';
+    
+    schedule.forEach(item => {
+        if (item.class) {
+            scheduleHtml += `
+                <li style="margin-bottom: 8px;">
+                    <strong>${item.time}</strong> - ${item.class} (${item.subject})
+                </li>
+            `;
+        }
+    });
+    
+    scheduleHtml += '</ul>';
+    todaySchedule.innerHTML = scheduleHtml;
+}
+
+async function showMyClasses() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-chalkboard-teacher"></i> My Classes</h2>
+            <button class="btn" onclick="refreshClasses()">
+                <i class="fa-solid fa-refresh"></i> Refresh
+            </button>
+        </div>
+        <div id="classesContainer">
+            <div class="loading-text">
+                <div class="spinner"></div>
+                Loading your classes...
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+    updateSidebarActive('classes');
+    
+    await loadTeacherClasses();
+}
+
+async function loadTeacherClasses() {
+    try {
+        const classes = await fetchTeacherClasses();
+        const classesContainer = document.getElementById('classesContainer');
+        
+        if (!classes || classes.length === 0) {
+            classesContainer.innerHTML = `
+                <div class="section-card" style="text-align: center; padding: 40px;">
+                    <i class="fa-solid fa-chalkboard-teacher" style="font-size: 48px; color: var(--text-secondary); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--text-primary);">No Classes Assigned</h3>
+                    <p style="color: var(--text-secondary);">You are not assigned to any classes yet.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        classes.forEach((classItem, index) => {
+            html += `
+                <div class="section-card" onclick="viewClassDetails(${classItem.id})">
+                    <h3><i class="fa-solid fa-chalkboard"></i> ${classItem.class_name}</h3>
+                    <p><strong>Class Code:</strong> ${classItem.class_code}</p>
+                    <p><strong>Subjects:</strong> ${classItem.teaching_subjects || 'Not specified'}</p>
+                    <p><strong>Students:</strong> ${classItem.student_count || 0} enrolled</p>
+                    <p><strong>Status:</strong> ${classItem.is_primary ? 'Primary Teacher' : 'Co-teacher'}</p>
+                    <div class="status-badge ${classItem.is_primary ? 'status-active' : 'status-pending'}">
+                        ${classItem.is_primary ? 'Primary' : 'Secondary'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        classesContainer.innerHTML = html;
+        
+    } catch (error) {
+        console.error("Error loading classes:", error);
+        document.getElementById('classesContainer').innerHTML = `
+            <div class="section-card" style="text-align: center; padding: 40px; background: rgba(231, 76, 60, 0.1);">
+                <i class="fa-solid fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 20px;"></i>
+                <h3 style="color: var(--text-primary);">Error Loading Classes</h3>
+                <p style="color: var(--text-secondary);">Failed to load your classes. Please try again later.</p>
+                <button class="btn" onclick="showMyClasses()" style="margin-top: 15px;">
+                    <i class="fa-solid fa-refresh"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+async function refreshClasses() {
+    await loadTeacherClasses();
+}
+
+async function viewClassDetails(classId) {
+    try {
+        const response = await fetch(`http://localhost:5000/api/classes/${classId}`, {
+            headers: {
+                "Authorization": "Bearer " + teacherToken
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                showClassDetailsModal(data);
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching class details:", error);
+        alert("Failed to load class details. Please try again.");
+    }
+}
+
+function showClassDetailsModal(data) {
+    const classInfo = data.class;
+    const students = data.students || [];
+    const teachers = data.teachers || [];
+    
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-chalkboard"></i> ${classInfo.class_name}</h2>
+            <button class="btn btn-secondary" onclick="showMyClasses()">
+                <i class="fa-solid fa-arrow-left"></i> Back to Classes
+            </button>
+        </div>
+        
+        <div class="section-card">
+            <h3><i class="fa-solid fa-circle-info"></i> Class Information</h3>
+            <div style="margin-top: 20px;">
+                <p><strong>Class Code:</strong> ${classInfo.class_code}</p>
+                <p><strong>Department:</strong> ${classInfo.department || 'Not specified'}</p>
+                <p><strong>Stream:</strong> ${classInfo.stream || 'Not specified'}</p>
+                <p><strong>Division:</strong> ${classInfo.division || 'Not specified'}</p>
+                <p><strong>Semester:</strong> ${classInfo.semester || 'N/A'}</p>
+                <p><strong>Academic Year:</strong> ${classInfo.academic_year || '2025-26'}</p>
+                <p><strong>Subjects:</strong> ${classInfo.subjects || 'Not specified'}</p>
+                <p><strong>Total Students:</strong> ${students.length}</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h3><i class="fa-solid fa-users"></i> Enrolled Students (${students.length})</h3>
+            ${students.length > 0 ? `
+                <div style="overflow-x: auto; margin-top: 15px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student Code</th>
+                                <th>Name</th>
+                                <th>Roll No</th>
+                                <th>Email</th>
+                                <th>Subjects</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${students.map(student => `
+                                <tr>
+                                    <td>${student.student_code || 'N/A'}</td>
+                                    <td>${student.name || 'N/A'}</td>
+                                    <td>${student.roll_no || 'N/A'}</td>
+                                    <td>${student.email || 'N/A'}</td>
+                                    <td>${student.enrolled_subjects || 'N/A'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : '<p style="color: var(--text-secondary); margin-top: 15px;">No students enrolled in this class.</p>'}
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h3><i class="fa-solid fa-chalkboard-user"></i> Assigned Teachers</h3>
+            ${teachers.length > 0 ? `
+                <div style="overflow-x: auto; margin-top: 15px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Teacher Code</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Subjects</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${teachers.map(teacher => `
+                                <tr>
+                                    <td>${teacher.teacher_code || 'N/A'}</td>
+                                    <td>${teacher.name || 'N/A'}</td>
+                                    <td>${teacher.email || 'N/A'}</td>
+                                    <td>${teacher.subjects || 'N/A'}</td>
+                                    <td>${teacher.is_primary ? '<span class="status-badge status-active">Primary</span>' : '<span class="status-badge status-pending">Co-teacher</span>'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : '<p style="color: var(--text-secondary); margin-top: 15px;">No teachers assigned to this class.</p>'}
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+            <button class="btn" onclick="showAnnouncementsForClass(${classInfo.id})">
+                <i class="fa-solid fa-bullhorn"></i> View Announcements
+            </button>
+            <button class="btn" onclick="showMaterialsForClass(${classInfo.id})">
+                <i class="fa-solid fa-book"></i> View Study Materials
+            </button>
+        </div>
+    `;
+}
+
+function showSchedule() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-calendar-alt"></i> My Schedule</h2>
+        </div>
+        <div class="section-card">
+            <h3><i class="fa-solid fa-calendar-day"></i> Weekly Timetable</h3>
+            <div style="overflow-x: auto; margin-top: 20px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: var(--hover-bg);">
+                        <tr>
+                            <th style="padding: 12px; border: 1px solid var(--border-color);">Day/Time</th>
+                            <th style="padding: 12px; border: 1px solid var(--border-color);">9:00 - 10:30</th>
+                            <th style="padding: 12px; border: 1px solid var(--border-color);">10:30 - 12:00</th>
+                            <th style="padding: 12px; border: 1px solid var(--border-color);">1:00 - 2:30</th>
+                            <th style="padding: 12px; border: 1px solid var(--border-color);">2:30 - 4:00</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid var(--border-color); font-weight: bold;">Monday</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">-</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">Chemistry Lab</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">Lunch</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">Web Development</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid var(--border-color); font-weight: bold;">Tuesday</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">Business Maths</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">Data Structures</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">-</td>
+                            <td style="padding: 12px; border: 1px solid var(--border-color);">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+    updateSidebarActive('schedule');
+}
+
+function showStudents() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-user-graduate"></i> Student Management</h2>
+        </div>
+        <div class="section-container">
+            <div class="section-card">
+                <h3><i class="fa-solid fa-users"></i> Class Rosters</h3>
+                <p>View and manage student lists for each class.</p>
+                <div id="classRostersList">
+                    <div class="loading-text">
+                        <div class="spinner"></div>
+                        Loading class rosters...
+                    </div>
+                </div>
+            </div>
+            <div class="section-card">
+                <h3><i class="fa-solid fa-chart-line"></i> Performance Tracking</h3>
+                <p>Track student grades and academic performance.</p>
+                <div style="margin-top: 15px;">
+                    <p><strong>Average Scores:</strong></p>
+                    <p>• Test 1: 78%</p>
+                    <p>• Assignment 1: 85%</p>
+                    <p>• Mid-term: 72%</p>
+                </div>
+            </div>
+            <div class="section-card">
+                <h3><i class="fa-solid fa-comments"></i> Student Communication</h3>
+                <p>Send announcements and communicate with students.</p>
+                <button class="btn btn-success" style="margin-top: 15px;">
+                    <i class="fa-solid fa-envelope"></i> Send Announcement
+                </button>
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+    updateSidebarActive('students');
+    
+    // Load class rosters
+    loadClassRosters();
+}
+
+async function loadClassRosters() {
+    try {
+        const classes = await fetchTeacherClasses();
+        const rostersList = document.getElementById('classRostersList');
+        
+        if (!classes || classes.length === 0) {
+            rostersList.innerHTML = '<p style="color: var(--text-secondary);">No classes assigned.</p>';
+            return;
+        }
+        
+        let html = '<ul style="margin-top: 15px; padding-left: 20px; color: var(--text-secondary);">';
+        
+        classes.forEach(classItem => {
+            html += `<li>${classItem.class_name} - ${classItem.student_count || 0} Students</li>`;
+        });
+        
+        html += '</ul>';
+        rostersList.innerHTML = html;
+        
+    } catch (error) {
+        console.error("Error loading class rosters:", error);
+        document.getElementById('classRostersList').innerHTML = 
+            '<p style="color: #e74c3c;">Failed to load class rosters.</p>';
+    }
+}
+
+function showAttendance() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-clipboard-check"></i> Attendance System</h2>
+        </div>
+        <div class="section-container">
+            <div class="section-card">
+                <h3><i class="fa-solid fa-calendar-check"></i> Take Attendance</h3>
+                <p>Mark attendance for today's classes.</p>
+                <button class="btn btn-success" style="margin-top: 15px;">
+                    <i class="fa-solid fa-check-circle"></i> Mark Today's Attendance
+                </button>
+            </div>
+            <div class="section-card">
+                <h3><i class="fa-solid fa-chart-bar"></i> Attendance Reports</h3>
+                <p>View attendance statistics and reports.</p>
+                <div style="margin-top: 15px;">
+                    <p><strong>Monthly Attendance:</strong></p>
+                    <p>• Present: 92%</p>
+                    <p>• Absent: 6%</p>
+                    <p>• Leave: 2%</p>
+                </div>
+            </div>
+            <div class="section-card">
+                <h3><i class="fa-solid fa-file-export"></i> Export Reports</h3>
+                <p>Generate and download attendance reports.</p>
+                <button class="btn" style="margin-top: 15px;">
+                    <i class="fa-solid fa-download"></i> Download Report
+                </button>
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+    updateSidebarActive('attendance');
+}
+
+async function showResources() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-book"></i> Teaching Resources</h2>
+            <button class="btn btn-success" onclick="openMaterialModal()">
+                <i class="fa-solid fa-plus"></i> Upload Material
+            </button>
+        </div>
+        <div id="resourcesContainer">
+            <div class="loading-text">
+                <div class="spinner"></div>
+                Loading resources...
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+    updateSidebarActive('resources');
+    
+    await loadTeacherMaterials();
+}
+
+async function loadTeacherMaterials() {
+    try {
+        // First get teacher's classes
+        const classes = await fetchTeacherClasses();
+        const resourcesContainer = document.getElementById('resourcesContainer');
+        
+        if (!classes || classes.length === 0) {
+            resourcesContainer.innerHTML = `
+                <div class="section-card" style="text-align: center; padding: 40px;">
+                    <i class="fa-solid fa-book" style="font-size: 48px; color: var(--text-secondary); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--text-primary);">No Classes Found</h3>
+                    <p style="color: var(--text-secondary);">You need to be assigned to classes to upload resources.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // For now, show a static list - you can enhance this to fetch actual materials
+        resourcesContainer.innerHTML = `
+            <div class="section-container">
+                <div class="section-card" onclick="openMaterialModal()">
+                    <h3><i class="fa-solid fa-upload"></i> Upload Materials</h3>
+                    <p>Upload lecture notes, presentations, and study materials.</p>
+                    <div class="status-badge status-active">Click to upload</div>
+                </div>
+                <div class="section-card">
+                    <h3><i class="fa-solid fa-folder"></i> Course Materials</h3>
+                    <p>Access all uploaded teaching resources.</p>
+                    <ul style="margin-top: 15px; padding-left: 20px; color: var(--text-secondary);">
+                        <li>Lecture Notes (25 files)</li>
+                        <li>Presentations (12 files)</li>
+                        <li>Question Papers (8 files)</li>
+                        <li>Assignments (15 files)</li>
+                    </ul>
+                </div>
+                <div class="section-card">
+                    <h3><i class="fa-solid fa-share-alt"></i> Share with Students</h3>
+                    <p>Share resources with your students.</p>
+                    <button class="btn" style="margin-top: 15px;">
+                        <i class="fa-solid fa-share"></i> Share Resources
+                    </button>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error("Error loading resources:", error);
+        document.getElementById('resourcesContainer').innerHTML = `
+            <div class="section-card" style="text-align: center; padding: 40px; background: rgba(231, 76, 60, 0.1);">
+                <i class="fa-solid fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 20px;"></i>
+                <h3 style="color: var(--text-primary);">Error Loading Resources</h3>
+                <p style="color: var(--text-secondary);">Failed to load resources. Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+async function showAnnouncements() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-bullhorn"></i> Announcements</h2>
+            <button class="btn btn-success" onclick="openAnnouncementModal()">
+                <i class="fa-solid fa-plus"></i> Create Announcement
+            </button>
+        </div>
+        <div id="announcementsContainer">
+            <div class="loading-text">
+                <div class="spinner"></div>
+                Loading announcements...
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+    updateSidebarActive('announcements');
+    
+    await loadTeacherAnnouncements();
+}
+
+async function loadTeacherAnnouncements() {
+    try {
+        // For now, show a static list - you can enhance this to fetch actual announcements
+        const announcementsContainer = document.getElementById('announcementsContainer');
+        
+        announcementsContainer.innerHTML = `
+            <div class="section-card">
+                <h3><i class="fa-solid fa-bullhorn"></i> Recent Announcements</h3>
+                <div style="margin-top: 15px;">
+                    <div style="padding: 15px; background: var(--hover-bg); border-radius: 8px; margin-bottom: 10px;">
+                        <strong>Mid-term Exam Schedule</strong>
+                        <p style="color: var(--text-secondary); margin-top: 5px;">Posted: 2 days ago | Class: Web Development</p>
+                        <p>The mid-term exam schedule has been updated. Please check the timetable section.</p>
+                    </div>
+                    <div style="padding: 15px; background: var(--hover-bg); border-radius: 8px; margin-bottom: 10px;">
+                        <strong>Assignment Submission Deadline</strong>
+                        <p style="color: var(--text-secondary); margin-top: 5px;">Posted: 5 days ago | Class: Data Structures</p>
+                        <p>The deadline for Assignment 2 has been extended to next Monday.</p>
+                    </div>
+                    <div style="padding: 15px; background: var(--hover-bg); border-radius: 8px;">
+                        <strong>Important: Lab Safety Guidelines</strong>
+                        <p style="color: var(--text-secondary); margin-top: 5px;">Posted: 1 week ago | Class: Chemistry Lab</p>
+                        <p>Please review the updated lab safety guidelines before your next lab session.</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error("Error loading announcements:", error);
+        document.getElementById('announcementsContainer').innerHTML = `
+            <div class="section-card" style="text-align: center; padding: 40px; background: rgba(231, 76, 60, 0.1);">
+                <i class="fa-solid fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 20px;"></i>
+                <h3 style="color: var(--text-primary);">Error Loading Announcements</h3>
+                <p style="color: var(--text-secondary);">Failed to load announcements. Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+function showProfile() {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('otherSections').innerHTML = `
+        <div class="page-header">
+            <h2 class="page-title"><i class="fa-solid fa-user"></i> My Profile</h2>
+        </div>
+        <div class="section-card">
+            <h3><i class="fa-solid fa-circle-info"></i> Personal Information</h3>
+            <div class="teacher-profile-info">
+                <p><strong>Name:</strong> ${teacherData.name}</p>
+                <p><strong>Email:</strong> ${teacherData.email}</p>
+                <p><strong>Teacher Code:</strong> ${teacherData.code}</p>
+                <p><strong>Department:</strong> ${teacherData.department}</p>
+                <p><strong>Subjects:</strong> ${teacherData.subjects}</p>
+                <p><strong>Employee ID:</strong> ${teacherData.id}</p>
+                <p><strong>Academic Year:</strong> 2025-26</p>
+                <p><strong>Joining Date:</strong> 15-Aug-2023</p>
+            </div>
+            <button class="btn" style="margin-top: 20px;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+            </button>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="showDashboard()" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    `;
+    document.getElementById('otherSections').style.display = 'block';
+}
+
+function changePassword() {
+    alert("Password change feature will be available soon.");
+}
+
+// ================= MODAL FUNCTIONS =================
+async function openAnnouncementModal() {
+    try {
+        // Load teacher's classes for the dropdown
+        const classes = await fetchTeacherClasses();
+        const classSelect = document.getElementById('announcementClass');
+        
+        // Clear existing options except the first one
+        while (classSelect.options.length > 1) {
+            classSelect.remove(1);
+        }
+        
+        // Add class options
+        classes.forEach(classItem => {
+            const option = document.createElement('option');
+            option.value = classItem.id;
+            option.textContent = `${classItem.class_name} (${classItem.class_code})`;
+            classSelect.appendChild(option);
+        });
+        
+        // Clear form
+        document.getElementById('announcementTitle').value = '';
+        document.getElementById('announcementContent').value = '';
+        document.getElementById('announcementType').value = 'general';
+        
+        // Show modal
+        document.getElementById('announcementModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error("Error opening announcement modal:", error);
+        alert("Failed to load classes. Please try again.");
+    }
+}
+
+function closeAnnouncementModal() {
+    document.getElementById('announcementModal').style.display = 'none';
+}
+
+async function createAnnouncement() {
+    const classId = document.getElementById('announcementClass').value;
+    const title = document.getElementById('announcementTitle').value.trim();
+    const content = document.getElementById('announcementContent').value.trim();
+    const type = document.getElementById('announcementType').value;
+    
+    if (!classId) {
+        alert("Please select a class.");
+        return;
+    }
+    
+    if (!title || !content) {
+        alert("Please enter both title and content.");
+        return;
+    }
+    
+    try {
+        const response = await fetch("http://localhost:5000/api/announcements", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + teacherToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                class_id: classId,
+                title: title,
+                content: content,
+                announcement_type: type
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                alert("Announcement created successfully!");
+                closeAnnouncementModal();
+                showAnnouncements(); // Refresh announcements
+            } else {
+                throw new Error(data.message || "Failed to create announcement");
+            }
+        } else {
+            throw new Error("Failed to create announcement");
+        }
+    } catch (error) {
+        console.error("Error creating announcement:", error);
+        alert("Failed to create announcement: " + error.message);
+    }
+}
+
+async function openMaterialModal() {
+    try {
+        // Load teacher's classes for the dropdown
+        const classes = await fetchTeacherClasses();
+        const classSelect = document.getElementById('materialClass');
+        
+        // Clear existing options except the first one
+        while (classSelect.options.length > 1) {
+            classSelect.remove(1);
+        }
+        
+        // Add class options
+        classes.forEach(classItem => {
+            const option = document.createElement('option');
+            option.value = classItem.id;
+            option.textContent = `${classItem.class_name} (${classItem.class_code})`;
+            classSelect.appendChild(option);
+        });
+        
+        // Clear form
+        document.getElementById('materialSubject').innerHTML = '<option value="">Select subject</option>';
+        document.getElementById('materialTitle').value = '';
+        document.getElementById('materialDescription').value = '';
+        document.getElementById('materialType').value = 'document';
+        document.getElementById('materialFile').value = '';
+        document.getElementById('materialFileName').value = '';
+        
+        // Show modal
+        document.getElementById('materialModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error("Error opening material modal:", error);
+        alert("Failed to load classes. Please try again.");
+    }
+}
+
+async function loadClassSubjects() {
+    const classId = document.getElementById('materialClass').value;
+    const subjectSelect = document.getElementById('materialSubject');
+    
+    if (!classId) {
+        subjectSelect.innerHTML = '<option value="">Select subject</option>';
+        return;
+    }
+    
+    try {
+        // First try to get the class details
+        const classResponse = await fetch(`http://localhost:5000/api/classes/${classId}`, {
+            headers: {
+                "Authorization": "Bearer " + teacherToken
+            }
+        });
+        
+        if (classResponse.ok) {
+            const classData = await classResponse.json();
+            if (classData.success && classData.class) {
+                const subjects = classData.class.subjects || '';
+                
+                // Clear existing options except the first one
+                subjectSelect.innerHTML = '<option value="">Select subject</option>';
+                
+                if (subjects) {
+                    const subjectArray = subjects.split(',').map(s => s.trim()).filter(s => s !== '');
+                    
+                    subjectArray.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject;
+                        option.textContent = subject;
+                        subjectSelect.appendChild(option);
+                    });
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Error loading class subjects:", error);
+    }
+}
+
+function closeMaterialModal() {
+    document.getElementById('materialModal').style.display = 'none';
+}
+
+async function uploadStudyMaterial() {
+    const classId = document.getElementById('materialClass').value;
+    const subject = document.getElementById('materialSubject').value.trim();
+    const title = document.getElementById('materialTitle').value.trim();
+    const description = document.getElementById('materialDescription').value.trim();
+    const type = document.getElementById('materialType').value;
+    const fileUrl = document.getElementById('materialFile').value.trim();
+    const fileName = document.getElementById('materialFileName').value.trim();
+    
+    if (!classId || !subject || !title || !fileUrl) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+    
+    try {
+        const response = await fetch("http://localhost:5000/api/study-materials", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + teacherToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                class_id: classId,
+                subject: subject,
+                title: title,
+                description: description,
+                material_type: type,
+                file_url: fileUrl,
+                file_name: fileName,
+                file_size: 0 // You can calculate this if needed
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                alert("Study material uploaded successfully!");
+                closeMaterialModal();
+                showResources(); // Refresh resources
+            } else {
+                throw new Error(data.message || "Failed to upload material");
+            }
+        } else {
+            throw new Error("Failed to upload material");
+        }
+    } catch (error) {
+        console.error("Error uploading study material:", error);
+        alert("Failed to upload study material: " + error.message);
+    }
+}
+
+function showAnnouncementsForClass(classId) {
+    alert(`Viewing announcements for class ID: ${classId}\nThis feature will be implemented soon.`);
+}
+
+function showMaterialsForClass(classId) {
+    alert(`Viewing study materials for class ID: ${classId}\nThis feature will be implemented soon.`);
+}
+
+function updateSidebarActive(section) {
+    const sidebarItems = document.querySelectorAll('.sidebar ul li');
+    sidebarItems.forEach(item => item.classList.remove('active'));
+    
+    const sectionMap = {
+        'dashboard': 0,
+        'classes': 1,
+        'schedule': 2,
+        'students': 3,
+        'attendance': 4,
+        'resources': 5,
+        'announcements': 6
+    };
+    
+    if (sectionMap[section] !== undefined) {
+        sidebarItems[sectionMap[section]].classList.add('active');
+    }
+    
+    if (window.innerWidth <= 768) {
+        hideMobileSidebar();
+    }
+}
+
+// ================= THEME TOGGLE =================
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('themeIcon');
+
+    body.classList.toggle('dark-theme');
+
+    if (body.classList.contains('dark-theme')) {
+        themeIcon.className = 'fa-solid fa-sun';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        themeIcon.className = 'fa-solid fa-moon';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// ================= SIDEBAR FUNCTIONS =================
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const mobileOverlay = document.getElementById("mobileSidebarOverlay");
+
+    if (window.innerWidth <= 768) {
+        sidebar.classList.toggle("mobile-show");
+        mobileOverlay.classList.toggle("active");
+    } else {
+        sidebar.classList.toggle("collapsed");
+    }
+}
+
+function hideMobileSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const mobileOverlay = document.getElementById("mobileSidebarOverlay");
+
+    sidebar.classList.remove("mobile-show");
+    mobileOverlay.classList.remove("active");
+}
+
+// ================= PROFILE DROPDOWN =================
+function toggleDropdown() {
+    document.getElementById("dropdown").classList.toggle("active");
+}
+
+document.addEventListener('click', function (event) {
+    const dropdown = document.getElementById("dropdown");
+    const profile = document.querySelector('.profile');
+
+    if (dropdown.classList.contains('active') && !profile.contains(event.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+
+// ================= FULLSCREEN =================
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error enabling fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// ================= LOGOUT =================
+function logout(force = false) {
+    if (force || confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("teacherToken");
+        localStorage.removeItem("teacherEmail");
+        localStorage.removeItem("teacherName");
+        localStorage.removeItem("teacherCode");
+        localStorage.removeItem("teacherDepartment");
+        localStorage.removeItem("teacherId");
+        localStorage.removeItem("teacherSubjects");
+        window.location.href = "login.html";
+    }
+}
+
+// ================= INITIALIZE =================
+document.addEventListener('DOMContentLoaded', function () {
+    initializePage();
+    
+    // Add click outside to close sidebar on mobile
+    document.addEventListener('click', function (event) {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.querySelector('.fa-bars');
+
+        if (
+            window.innerWidth <= 768 &&
+            sidebar.classList.contains('mobile-show') &&
+            !sidebar.contains(event.target) &&
+            !toggleBtn.contains(event.target)
+        ) {
+            hideMobileSidebar();
+        }
+    });
+});
+
+// ================= BLOCK BACK BUTTON =================
+window.history.pushState(null, "", window.location.href);
+window.onpopstate = function () {
+    window.history.pushState(null, "", window.location.href);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,4217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Responsive Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ===== CSS VARIABLES FOR EASY THEME MANAGEMENT ===== */
+        :root {
+            /* Primary Colors */
+            --primary-bg: #f8f9fa;
+            --sidebar-bg: #2c3e50;
+            --header-bg: #34495e;
+            --card-bg: #ffffff;
+            
+            /* Text Colors */
+            --text-primary: #2c3e50;
+            --text-secondary: #5d6d7e;
+            --text-light: #ffffff;
+            
+            /* Accent Colors */
+            --accent-color: #3498db;
+            --border-color: #e0e0e0;
+            --hover-bg: #f5f5f5;
+            
+            /* Dark Theme Variables */
+            --dark-primary-bg: #121212;
+            --dark-sidebar-bg: #1a1a1a;
+            --dark-header-bg: #2d2d2d;
+            --dark-card-bg: #2d2d2d;
+            --dark-text-primary: #e0e0e0;
+            --dark-text-secondary: #b0b0b0;
+            --dark-border-color: #404040;
+            --dark-hover-bg: #3d3d3d;
+        }
+
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--primary-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-theme {
+            --primary-bg: var(--dark-primary-bg);
+            --sidebar-bg: var(--dark-sidebar-bg);
+            --header-bg: var(--dark-header-bg);
+            --card-bg: var(--dark-card-bg);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --border-color: var(--dark-border-color);
+            --hover-bg: var(--dark-hover-bg);
+        }
+
+        /* ===== SIDEBAR STYLES ===== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: var(--text-light);
+            padding: 20px 0;
+            transition: 0.3s ease;
+            overflow: hidden;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar ul li:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar ul li.active {
+            background: rgba(52, 152, 219, 0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar ul li i {
+            min-width: 24px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed span {
+            display: none;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .logo img {
+            width: 140px;
+            background: whitesmoke;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+            transform: scale(1.03);
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== HEADER STYLES ===== */
+        .header {
+            height: 70px;
+            background: var(--header-bg);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+        }
+
+        .header-left,
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .toggle-btn {
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .org-name {
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.3px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        /* ===== PROFILE DROPDOWN ===== */
+        .profile {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile i {
+            font-size: 32px;
+            color: #ecf0f1;
+            transition: transform 0.2s ease;
+        }
+
+        .profile i:hover {
+            transform: scale(1.1);
+        }
+
+        .dropdown {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            width: 260px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown.active {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown .info {
+            padding: 20px;
+            background: var(--hover-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown .info strong {
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .dropdown .info small {
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .dropdown ul {
+            list-style: none;
+        }
+
+        .dropdown ul li {
+            padding: 14px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown ul li:hover {
+            background: var(--hover-bg);
+        }
+
+        .dropdown ul li i {
+            width: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content {
+            flex: 1;
+            padding: 25px;
+            background: var(--primary-bg);
+            overflow-y: auto;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .content h2 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ===== SECTION CARDS FOR DASHBOARD ===== */
+        .section-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-card h3 i {
+            color: var(--accent-color);
+        }
+
+        .section-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* ===== MANAGEMENT SECTION STYLES (Shared by Teachers and Students) ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-title {
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* ===== CSV UPLOAD CARD ===== */
+        .csv-upload-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .upload-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .file-input-label:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .selected-file-name {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: var(--hover-bg);
+            border-radius: 5px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn {
+            padding: 10px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            background: #219653;
+        }
+
+        .upload-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Class-specific button styles */
+        .class-btn {
+            background: #3498db;
+        }
+
+        .class-btn:hover:not(:disabled) {
+            background: #2980b9;
+        }
+
+        .danger-btn {
+            background: #e74c3c;
+        }
+
+        .danger-btn:hover:not(:disabled) {
+            background: #c0392b;
+        }
+
+        .warning-btn {
+            background: #f39c12;
+        }
+
+        .warning-btn:hover:not(:disabled) {
+            background: #d68910;
+        }
+
+        .upload-status {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .upload-status.success {
+            display: block;
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid #27ae60;
+            color: #27ae60;
+        }
+
+        .upload-status.error {
+            display: block;
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .upload-status.info {
+            display: block;
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid #3498db;
+            color: #3498db;
+        }
+
+        /* ===== TABLE CONTROLS ===== */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 9px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .total-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            background: var(--hover-bg);
+            border-radius: 6px;
+        }
+
+        /* ===== TABLE STYLES ===== */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table thead {
+            background: var(--hover-bg);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .data-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .data-table th:last-child {
+            border-right: none;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            color: var(--text-primary);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .data-table td:last-child {
+            border-right: none;
+        }
+
+        .student-code, .teacher-code, .class-code {
+            font-weight: 500;
+            color: var(--accent-color);
+        }
+
+        .department-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .faculty-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stream-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stats-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        /* Action buttons in tables */
+        .action-btn {
+            padding: 5px 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #2980b9;
+        }
+
+        .edit-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #d68910;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .assign-btn {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .assign-btn:hover {
+            background: #8e44ad;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .no-data i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: var(--border-color);
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            gap: 10px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 0 10px;
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 992px) {
+            .section-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                top: 0;
+                height: 100%;
+                z-index: 200;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.mobile-show {
+                left: 0;
+            }
+
+            .org-name {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .section-container {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 13px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 12px;
+            }
+
+            .upload-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box,
+            .filter-select {
+                min-width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .header-right {
+                gap: 10px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-card {
+                padding: 20px;
+            }
+
+            .content h2 {
+                font-size: 24px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .data-table {
+                min-width: 600px;
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .locked {
+            display: none;
+        }
+
+        .badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .sidebar.collapsed .badge {
+            display: none;
+        }
+
+        /* ===== THEME TOGGLE BUTTON ===== */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== CONTENT SECTIONS ===== */
+        .dashboard-content {
+            transition: opacity 0.3s ease;
+        }
+
+        .dashboard-content.hidden {
+            display: none;
+        }
+
+        /* Mobile Sidebar Overlay */
+        .mobile-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 199;
+        }
+
+        .mobile-sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== NEW FILTERS STYLES ===== */
+        .multi-select-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-group .form-control {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        /* Student selection styles */
+        .student-selection-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--hover-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .student-search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .student-search-container input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .student-search-container button {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .students-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .student-preview-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: var(--hover-bg);
+            border-radius: 4px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .student-preview-item small {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* ===== SUBJECT CHECKBOX STYLES ===== */
+        .subjects-checkbox-list {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: var(--hover-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .subject-checkbox-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .subject-checkbox-item:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+
+        .subject-checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .subject-checkbox-item label {
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .subject-checkbox-item.select-all {
+            background: rgba(52, 152, 219, 0.1);
+            border-color: var(--accent-color);
+            margin-top: 10px;
+        }
+
+        .subject-checkbox-item.select-all label {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        /* Custom checkbox styling */
+        .subject-checkbox-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--card-bg);
+            cursor: pointer;
+            position: relative;
+            margin-right: 10px;
+        }
+
+        .subject-checkbox-item input[type="checkbox"]:checked {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .subject-checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .subject-checkbox-item input[type="checkbox"]:indeterminate {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .subject-checkbox-item input[type="checkbox"]:indeterminate::after {
+            content: '–';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ===== TEACHER ASSIGNMENT BADGES ===== */
+        .teacher-assignment-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        .teacher-assignment-badge.primary {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        /* ===== CLASS TEACHERS TABLE STYLES ===== */
+        .class-teachers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .class-teachers-table th {
+            padding: 10px;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .class-teachers-table td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .class-teachers-table .actions-cell {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar" id="sidebar">
+    <div class="logo">
+        <img src="logo-college.webp" alt="College Logo">
+    </div>
+
+    <ul>
+        <li class="active" onclick="showDashboard()"><i class="fa-solid fa-house"></i> <span>Dashboard</span></li>
+        <li onclick="showTeachers()"><i class="fa-solid fa-chalkboard-user"></i> <span>Teachers Management</span></li>
+        <li onclick="showStudents()"><i class="fa-solid fa-users"></i> <span>Students Management</span></li>
+        <li onclick="showClasses()"><i class="fa-solid fa-chalkboard"></i> <span>Class Management</span></li>
+        <li><i class="fa-solid fa-chart-line"></i> <span>Reports</span> <span class="badge">3</span></li>
+        <li><i class="fa-solid fa-calendar-days"></i> <span>Schedule</span></li>
+        <li><i class="fa-solid fa-circle-question"></i> <span>Help</span></li>
+    </ul>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="hideMobileSidebar()"></div>
+
+<div class="main locked" id="secureApp">
+    <div class="header">
+        <div class="header-left">
+            <i class="fa-solid fa-bars toggle-btn" onclick="toggleSidebar()"></i>
+            <i class="fa-solid fa-expand toggle-btn" onclick="toggleFullScreen()"></i>
+        </div>
+
+        <div class="header-right">
+            <span class="org-name">Modern College of Arts, Science and Commerce, Warje Pune – 411 058</span>
+            
+            <!-- Theme Toggle Button -->
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+
+            <div class="profile" onclick="toggleDropdown()">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="dropdown" id="dropdown">
+                    <div class="info">
+                        <strong>Welcome, </strong><br>
+                        <small>XYZ </small><br>
+                        <small>Academic Year: 2025–26</small>
+                    </div>
+                    <ul>
+                        <li><i class="fa-solid fa-user"></i> My Profile</li>
+                        <li><i class="fa-solid fa-key"></i> Change Password</li>
+                        <li><i class="fa-solid fa-bell"></i> Notifications</li>
+                        <li onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Dashboard Content -->
+        <div class="dashboard-content" id="dashboardContent">
+            <h2>Secure Academic Dashboard</h2>
+            <p>Welcome to the secure administrative dashboard for Modern College. Manage academic records, generate reports, and oversee student activities from this centralized interface.</p>
+            
+            <div class="section-container">
+                <!-- Dashboard Section -->
+                <div class="section-card">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Overview</h3>
+                    <p>View comprehensive statistics and analytics about academic performance, attendance, and institutional metrics.</p>
+                </div>
+                
+                <!-- Student Management Section -->
+                <div class="section-card" onclick="showStudents()">
+                    <h3><i class="fa-solid fa-graduation-cap"></i> Student Management</h3>
+                    <p>Manage student profiles, academic records, attendance, and disciplinary information.</p>
+                </div>
+                
+                <!-- Teacher Management Section -->
+                <div class="section-card" onclick="showTeachers()">
+                    <h3><i class="fa-solid fa-chalkboard-user"></i> Teacher Management</h3>
+                    <p>Manage faculty profiles, teaching assignments, and department allocations.</p>
+                </div>
+
+                <!-- Class Management Section -->
+                <div class="section-card" onclick="showClasses()">
+                    <h3><i class="fa-solid fa-chalkboard"></i> Class Management</h3>
+                    <p>Create and manage classes, assign teachers, and handle class enrollments.</p>
+                </div>
+                
+                <!-- Schedule Section -->
+                <div class="section-card">
+                    <h3><i class="fa-solid fa-calendar-check"></i> Academic Schedule</h3>
+                    <p>View and manage class schedules, examination timetables, and academic events.</p>
+                </div>
+                
+                <!-- Faculty Section -->
+                <div class="section-card">
+                    <h3><i class="fa-solid fa-chalkboard-user"></i> Faculty Directory</h3>
+                    <p>Access faculty information, teaching assignments, and department contacts.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teachers Management Content -->
+        <div id="teachersContent" style="display: none;">
+            <div class="page-header">
+                <h2 class="page-title"><i class="fa-solid fa-chalkboard-user"></i> Teachers Management</h2>
+                <div class="total-count" id="totalTeachers">Total: 0 teachers</div>
+            </div>
+
+            <!-- CSV Upload Card -->
+            <div class="csv-upload-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-primary); font-size: 18px;">
+                    <i class="fa-solid fa-file-import"></i> Import Teachers from CSV
+                </h3>
+                <div class="upload-area">
+                    <div class="file-input-wrapper">
+                        <label for="teacherCsvFileInput" class="file-input-label">
+                            <i class="fa-solid fa-file-csv"></i> Select CSV File
+                        </label>
+                        <input type="file" id="teacherCsvFileInput" class="file-input" accept=".csv">
+                        
+                        <div class="selected-file-name" id="teacherSelectedFileName" style="display: none;">
+                            <i class="fa-solid fa-file"></i>
+                            <span id="teacherFileNameDisplay">No file selected</span>
+                        </div>
+                    </div>
+                    
+                    <button class="upload-btn" id="teacherUploadBtn" onclick="uploadTeacherCSV()" disabled>
+                        <i class="fa-solid fa-upload"></i> Upload CSV
+                    </button>
+                </div>
+                
+                <div class="upload-status" id="teacherUploadStatus"></div>
+            </div>
+
+            <!-- Table Controls -->
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="teacherSearchInput" placeholder="Search teachers by name, email, or code..." oninput="filterTeachers()">
+                </div>
+                
+                <div class="filter-controls">
+                    <select class="filter-select" id="teacherDepartmentFilter" onchange="filterTeachers()">
+                        <option value="">All Departments</option>
+                        <!-- Departments will be loaded dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Teachers Table -->
+            <div class="table-container">
+                <div class="loading-spinner" id="teacherLoadingSpinner" style="display: none;">
+                    <i class="fa-solid fa-spinner"></i>
+                    <p>Loading teachers data...</p>
+                </div>
+                
+                <table class="data-table" id="teachersTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Teacher Code</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th style="width: 150px;">Department</th>
+                            <th>Subjects</th>
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersTableBody">
+                        <!-- Teachers data will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <div id="noTeachersMessage" class="no-data" style="display: none;">
+                    <i class="fa-solid fa-users-slash"></i>
+                    <p>No teachers found. Upload a CSV file to get started.</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="teacherPagination" style="display: none;">
+                <button class="pagination-btn" id="teacherPrevPage" onclick="changeTeacherPage(-1)" disabled>
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                </button>
+                <span class="page-info" id="teacherPageInfo">Page 1 of 1</span>
+                <button class="pagination-btn" id="teacherNextPage" onclick="changeTeacherPage(1)" disabled>
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Students Management Content -->
+        <div id="studentsContent" style="display: none;">
+            <div class="page-header">
+                <h2 class="page-title"><i class="fa-solid fa-users"></i> Students Management</h2>
+                <div class="total-count" id="totalStudents">Total: 0 students</div>
+            </div>
+
+            <!-- CSV Upload Card -->
+            <div class="csv-upload-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-primary); font-size: 18px;">
+                    <i class="fa-solid fa-file-import"></i> Import Students from CSV
+                </h3>
+                <div class="upload-area">
+                    <div class="file-input-wrapper">
+                        <label for="studentCsvFileInput" class="file-input-label">
+                            <i class="fa-solid fa-file-csv"></i> Select CSV File
+                        </label>
+                        <input type="file" id="studentCsvFileInput" class="file-input" accept=".csv">
+                        
+                        <div class="selected-file-name" id="studentSelectedFileName" style="display: none;">
+                            <i class="fa-solid fa-file"></i>
+                            <span id="studentFileNameDisplay">No file selected</span>
+                        </div>
+                    </div>
+                    
+                    <button class="upload-btn" id="studentUploadBtn" onclick="uploadStudentCSV()" disabled>
+                        <i class="fa-solid fa-upload"></i> Upload CSV
+                    </button>
+                </div>
+                
+                <div class="upload-status" id="studentUploadStatus"></div>
+            </div>
+
+            <!-- Table Controls -->
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="studentSearchInput" placeholder="Search students by name, email, or code..." oninput="filterStudents()">
+                </div>
+                
+                <div class="filter-controls">
+                    <select class="filter-select" id="studentFacultyFilter" onchange="filterStudents()">
+                        <option value="">All Faculties</option>
+                        <!-- Faculties will be loaded dynamically -->
+                    </select>
+                    <select class="filter-select" id="studentDepartmentFilter" onchange="filterStudents()">
+                        <option value="">All Departments</option>
+                        <!-- Departments will be loaded dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="table-container">
+                <div class="loading-spinner" id="studentLoadingSpinner" style="display: none;">
+                    <i class="fa-solid fa-spinner"></i>
+                    <p>Loading students data...</p>
+                </div>
+                
+                <table class="data-table" id="studentsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">Student Code</th>
+                            <th style="width: 80px;">Roll No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th style="width: 120px;">Faculty</th>
+                            <th style="width: 120px;">Department</th>
+                            <th style="width: 80px;">Stream</th>
+                            <th style="width: 80px;">Semester</th>
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- Students data will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <div id="noStudentsMessage" class="no-data" style="display: none;">
+                    <i class="fa-solid fa-users-slash"></i>
+                    <p>No students found. Upload a CSV file to get started.</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="studentPagination" style="display: none;">
+                <button class="pagination-btn" id="studentPrevPage" onclick="changeStudentPage(-1)" disabled>
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                </button>
+                <span class="page-info" id="studentPageInfo">Page 1 of 1</span>
+                <button class="pagination-btn" id="studentNextPage" onclick="changeStudentPage(1)" disabled>
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Class Management Content -->
+        <div id="classesContent" style="display: none;">
+            <div class="page-header">
+                <h2 class="page-title"><i class="fa-solid fa-chalkboard"></i> Class Management</h2>
+                <div class="total-count" id="totalClasses">Total: 0 classes</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="csv-upload-card">
+                <div class="upload-area">
+                    <button class="upload-btn class-btn" onclick="showCreateClassModal()">
+                        <i class="fa-solid fa-plus"></i> Create New Class
+                    </button>
+                    <button class="upload-btn warning-btn" onclick="loadClassesData()">
+                        <i class="fa-solid fa-refresh"></i> Refresh Classes
+                    </button>
+                </div>
+                <div class="upload-status" id="classStatus"></div>
+            </div>
+
+            <!-- Table Controls -->
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="classSearchInput" placeholder="Search classes by name, code, or department..." oninput="filterClasses()">
+                </div>
+                
+                <div class="filter-controls">
+                    <select class="filter-select" id="classFacultyFilter" onchange="filterClasses()">
+                        <option value="">All Faculties</option>
+                        <!-- Faculties will be loaded dynamically -->
+                    </select>
+                    <select class="filter-select" id="classDepartmentFilter" onchange="filterClasses()">
+                        <option value="">All Departments</option>
+                        <!-- Departments will be loaded dynamically -->
+                    </select>
+                    <select class="filter-select" id="classStreamFilter" onchange="filterClasses()">
+                        <option value="">All Streams</option>
+                        <!-- Streams will be loaded dynamically -->
+                    </select>
+                    <select class="filter-select" id="classSemesterFilter" onchange="filterClasses()">
+                        <option value="">All Semesters</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Classes Table -->
+            <div class="table-container">
+                <div class="loading-spinner" id="classLoadingSpinner" style="display: none;">
+                    <i class="fa-solid fa-spinner"></i>
+                    <p>Loading classes data...</p>
+                </div>
+                
+                <table class="data-table" id="classesTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Class Code</th>
+                            <th>Class Name</th>
+                            <th style="width: 100px;">Faculty</th>
+                            <th style="width: 120px;">Department</th>
+                            <th style="width: 100px;">Stream</th>
+                            <th style="width: 80px;">Semester</th>
+                            <th style="width: 100px;">Students</th>
+                            <th style="width: 100px;">Teachers</th>
+                            <th style="width: 150px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classesTableBody">
+                        <!-- Classes data will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <div id="noClassesMessage" class="no-data" style="display: none;">
+                    <i class="fa-solid fa-chalkboard"></i>
+                    <p>No classes found. Create a class or upload students to get started.</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="classPagination" style="display: none;">
+                <button class="pagination-btn" id="classPrevPage" onclick="changeClassPage(-1)" disabled>
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                </button>
+                <span class="page-info" id="classPageInfo">Page 1 of 1</span>
+                <button class="pagination-btn" id="classNextPage" onclick="changeClassPage(1)" disabled>
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Class Modal -->
+<div class="modal" id="createClassModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-plus-circle"></i> Create New Class</h3>
+            <button class="modal-close" onclick="hideCreateClassModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="multi-select-container">
+                <div class="filter-group">
+                    <label for="modalClassFaculty">Faculty *</label>
+                    <select id="modalClassFaculty" class="form-control" onchange="updateFacultyDepartments()">
+                        <option value="">Select Faculty</option>
+                        <!-- Faculties will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="modalClassDepartment">Department *</label>
+                    <select id="modalClassDepartment" class="form-control" onchange="updateDepartmentStreams()">
+                        <option value="">Select Department</option>
+                        <!-- Departments will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="modalClassStream">Stream</label>
+                    <select id="modalClassStream" class="form-control">
+                        <option value="">Select Stream</option>
+                        <!-- Streams will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="modalClassDivision">Division</label>
+                    <select id="modalClassDivision" class="form-control">
+                        <option value="">Select Division</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="modalClassSemester">Semester</label>
+                    <select id="modalClassSemester" class="form-control">
+                        <option value="">Select Semester</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="modalClassAcademicYear">Academic Year</label>
+                    <select id="modalClassAcademicYear" class="form-control">
+                        <option value="2025-26">2025-26</option>
+                        <option value="2024-25">2024-25</option>
+                        <option value="2023-24">2023-24</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="modalClassSubjects">Subjects (comma separated)</label>
+                <textarea id="modalClassSubjects" class="form-control" placeholder="e.g., Mathematics, Physics, Chemistry" rows="3"></textarea>
+            </div>
+            
+            <!-- Student Selection Section -->
+            <div class="student-selection-container">
+                <h4><i class="fa-solid fa-user-plus"></i> Add Students to Class</h4>
+                <p class="small-text" style="color: var(--text-secondary); margin-bottom: 15px;">
+                    Enter a student code to fetch all students with matching faculty, department, stream, division, semester, and academic year.
+                </p>
+                
+                <div class="student-search-container">
+                    <input type="text" id="studentCodeInput" placeholder="Enter student code (e.g., CS-BSC-A-1-25-001)" class="form-control">
+                    <button class="upload-btn" onclick="fetchStudentsByCode()">
+                        <i class="fa-solid fa-search"></i> Fetch Students
+                    </button>
+                </div>
+                
+                <div id="studentsPreview" class="students-preview" style="display: none;">
+                    <h5>Students to be added:</h5>
+                    <div id="previewStudentsList"></div>
+                </div>
+                
+                <div id="noStudentsFound" class="no-data" style="display: none; margin-top: 10px;">
+                    <i class="fa-solid fa-users-slash"></i>
+                    <p>No students found with matching criteria.</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="upload-btn warning-btn" onclick="hideCreateClassModal()">Cancel</button>
+            <button class="upload-btn" onclick="createClassWithStudents()">Create Class with Students</button>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Teacher Modal -->
+<div class="modal" id="assignTeacherModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-user-plus"></i> Assign Teacher to Class</h3>
+            <button class="modal-close" onclick="hideAssignTeacherModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="assignClassId">Class</label>
+                <input type="text" id="assignClassName" class="form-control" readonly>
+                <input type="hidden" id="assignClassId">
+            </div>
+            <div class="form-group">
+                <label for="assignTeacherId">Select Teacher *</label>
+                <select id="assignTeacherId" class="form-control" onchange="loadTeacherSubjects()">
+                    <option value="">Select a teacher</option>
+                    <!-- Teachers will be loaded dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Subjects to Teach *</label>
+                <div id="teacherSubjectsContainer" style="display: none;">
+                    <p class="small-text" style="color: var(--text-secondary); margin-bottom: 10px;">
+                        Select subjects for this teacher to teach:
+                    </p>
+                    <div id="teacherSubjectsList" class="subjects-checkbox-list">
+                        <!-- Subjects will be loaded here as checkboxes -->
+                    </div>
+                    <div id="noSubjectsMessage" class="no-data" style="display: none; margin-top: 10px;">
+                        <i class="fa-solid fa-book"></i>
+                        <p>No subjects found for this teacher.</p>
+                    </div>
+                </div>
+                <div id="loadingSubjects" class="loading-spinner" style="display: none; padding: 10px;">
+                    <i class="fa-solid fa-spinner"></i>
+                    <p>Loading subjects...</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="assignIsPrimary"> Set as Primary Teacher
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="upload-btn warning-btn" onclick="hideAssignTeacherModal()">Cancel</button>
+            <button class="upload-btn" id="assignTeacherBtn" onclick="assignTeacher()" disabled>Assign Teacher</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Teacher Assignment Modal -->
+<div class="modal" id="updateTeacherModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-user-edit"></i> Update Teacher Assignment</h3>
+            <button class="modal-close" onclick="hideUpdateTeacherModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="updateClassId">Class</label>
+                <input type="text" id="updateClassName" class="form-control" readonly>
+                <input type="hidden" id="updateClassId">
+            </div>
+            <div class="form-group">
+                <label for="updateTeacherId">Teacher</label>
+                <input type="text" id="updateTeacherName" class="form-control" readonly>
+                <input type="hidden" id="updateTeacherId">
+                <input type="hidden" id="updateAssignmentId">
+            </div>
+            <div class="form-group">
+                <label>Subjects to Teach *</label>
+                <div id="updateTeacherSubjectsContainer">
+                    <p class="small-text" style="color: var(--text-secondary); margin-bottom: 10px;">
+                        Select subjects for this teacher to teach:
+                    </p>
+                    <div id="updateTeacherSubjectsList" class="subjects-checkbox-list">
+                        <!-- Subjects will be loaded here as checkboxes -->
+                    </div>
+                    <div id="updateNoSubjectsMessage" class="no-data" style="display: none; margin-top: 10px;">
+                        <i class="fa-solid fa-book"></i>
+                        <p>No subjects found for this teacher.</p>
+                    </div>
+                </div>
+                <div id="updateLoadingSubjects" class="loading-spinner" style="display: none; padding: 10px;">
+                    <i class="fa-solid fa-spinner"></i>
+                    <p>Loading subjects...</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="updateIsPrimary"> Set as Primary Teacher
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="upload-btn warning-btn" onclick="hideUpdateTeacherModal()">Cancel</button>
+            <button class="upload-btn danger-btn" onclick="deleteTeacherAssignment()">Remove Teacher</button>
+            <button class="upload-btn" id="updateTeacherBtn" onclick="updateTeacherAssignment()">Update Assignment</button>
+        </div>
+    </div>
+</div>
+
+<!-- View Class Details Modal -->
+<div class="modal" id="viewClassModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-eye"></i> Class Details</h3>
+            <button class="modal-close" onclick="hideViewClassModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="classDetailsContent">
+                <!-- Class details will be loaded here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="upload-btn" onclick="hideViewClassModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ================= AUTH CHECK =================
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        window.location.href = "login.html";
+    }
+
+    async function verifyToken() {
+        try {
+            const res = await fetch("http://localhost:5000/api/protected", {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            if (!res.ok) {
+                throw new Error("Unauthorized");
+            }
+
+            const data = await res.json();
+            document.getElementById("secureApp").classList.remove("locked");
+
+        } catch (err) {
+            logout(true);
+        }
+    }
+
+    verifyToken();
+
+    // ================= USER INFO =================
+    const adminEmail = localStorage.getItem("adminEmail");
+    const adminName = localStorage.getItem("adminName") || "Admin";
+
+    if (adminEmail) {
+        const infoBox = document.querySelector(".dropdown .info");
+        infoBox.innerHTML = `
+            <strong>Welcome, ${adminName}</strong><br>
+            <small>${adminEmail}</small><br>
+            <small>Academic Year: 2025–26</small>
+        `;
+    }
+
+    // ================= PAGE NAVIGATION =================
+    function showDashboard() {
+        document.getElementById('dashboardContent').style.display = 'block';
+        document.getElementById('teachersContent').style.display = 'none';
+        document.getElementById('studentsContent').style.display = 'none';
+        document.getElementById('classesContent').style.display = 'none';
+        updateSidebarActive('dashboard');
+    }
+
+    function showTeachers() {
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('teachersContent').style.display = 'block';
+        document.getElementById('studentsContent').style.display = 'none';
+        document.getElementById('classesContent').style.display = 'none';
+        updateSidebarActive('teachers');
+        loadTeachersData();
+    }
+
+    function showStudents() {
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('teachersContent').style.display = 'none';
+        document.getElementById('studentsContent').style.display = 'block';
+        document.getElementById('classesContent').style.display = 'none';
+        updateSidebarActive('students');
+        loadStudentsData();
+    }
+
+    function showClasses() {
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('teachersContent').style.display = 'none';
+        document.getElementById('studentsContent').style.display = 'none';
+        document.getElementById('classesContent').style.display = 'block';
+        updateSidebarActive('classes');
+        loadClassesData();
+    }
+
+    function updateSidebarActive(section) {
+        const sidebarItems = document.querySelectorAll('.sidebar ul li');
+        sidebarItems.forEach(item => item.classList.remove('active'));
+        
+        if (section === 'dashboard') {
+            sidebarItems[0].classList.add('active');
+        } else if (section === 'teachers') {
+            sidebarItems[1].classList.add('active');
+        } else if (section === 'students') {
+            sidebarItems[2].classList.add('active');
+        } else if (section === 'classes') {
+            sidebarItems[3].classList.add('active');
+        }
+        
+        // Close mobile sidebar on click
+        if (window.innerWidth <= 768) {
+            hideMobileSidebar();
+        }
+    }
+
+    // ================= TEACHERS MANAGEMENT =================
+    let allTeachers = [];
+    let filteredTeachers = [];
+    let teacherCurrentPage = 1;
+    const teachersPerPage = 10;
+
+    // Load teachers data
+    async function loadTeachersData() {
+        showTeacherLoading(true);
+        
+        try {
+            // Load departments first
+            const deptResponse = await fetch('http://localhost:5000/api/departments', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            const deptData = await deptResponse.json();
+            
+            if (deptData.success) {
+                populateTeacherDepartmentFilter(deptData.departments || []);
+            }
+            
+            // Load teachers
+            const teachersResponse = await fetch('http://localhost:5000/api/teachers', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const teachersData = await teachersResponse.json();
+            
+            if (teachersData.success) {
+                allTeachers = teachersData.teachers || [];
+                filteredTeachers = [...allTeachers];
+                
+                updateTeachersTable();
+            } else {
+                throw new Error(teachersData.error || 'Failed to load teachers');
+            }
+            
+        } catch (error) {
+            console.error('Error loading teachers data:', error);
+            showTeacherUploadStatus('❌ Failed to load teachers data: ' + error.message, 'error');
+            allTeachers = [];
+            filteredTeachers = [];
+            updateTeachersTable();
+        } finally {
+            showTeacherLoading(false);
+        }
+    }
+
+    // Populate teacher department filter dropdown
+    function populateTeacherDepartmentFilter(departments) {
+        const departmentFilter = document.getElementById('teacherDepartmentFilter');
+        
+        // Clear existing options except the first one
+        while (departmentFilter.options.length > 1) {
+            departmentFilter.remove(1);
+        }
+        
+        // Add new options
+        departments.forEach(dept => {
+            if (dept && dept.trim() !== '') {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                departmentFilter.appendChild(option);
+            }
+        });
+    }
+
+    // Show/hide teacher loading spinner
+    function showTeacherLoading(show) {
+        const loadingSpinner = document.getElementById('teacherLoadingSpinner');
+        const teachersTable = document.getElementById('teachersTable');
+        
+        if (show) {
+            loadingSpinner.style.display = 'block';
+            teachersTable.style.display = 'none';
+        } else {
+            loadingSpinner.style.display = 'none';
+            teachersTable.style.display = 'table';
+        }
+    }
+
+    // Update the teachers table
+    function updateTeachersTable() {
+        const tableBody = document.getElementById('teachersTableBody');
+        const noTeachersMessage = document.getElementById('noTeachersMessage');
+        const pagination = document.getElementById('teacherPagination');
+        const teachersTable = document.getElementById('teachersTable');
+        
+        if (filteredTeachers.length === 0) {
+            tableBody.innerHTML = '';
+            noTeachersMessage.style.display = 'block';
+            teachersTable.style.display = 'none';
+            pagination.style.display = 'none';
+            document.getElementById('totalTeachers').textContent = 'Total: 0 teachers';
+            return;
+        }
+        
+        noTeachersMessage.style.display = 'none';
+        teachersTable.style.display = 'table';
+        
+        // Calculate pagination
+        const totalPages = Math.ceil(filteredTeachers.length / teachersPerPage);
+        const startIndex = (teacherCurrentPage - 1) * teachersPerPage;
+        const endIndex = Math.min(startIndex + teachersPerPage, filteredTeachers.length);
+        const pageTeachers = filteredTeachers.slice(startIndex, endIndex);
+        
+        // Clear table
+        tableBody.innerHTML = '';
+        
+        // Add rows
+        pageTeachers.forEach(teacher => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="teacher-code">${teacher.teacher_code || 'N/A'}</td>
+                <td>${teacher.name || 'N/A'}</td>
+                <td>${teacher.email || 'N/A'}</td>
+                <td>
+                    <span class="department-badge">${teacher.department || 'Not Assigned'}</span>
+                </td>
+                <td>${teacher.subjects || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-btn" title="View" onclick="viewTeacher(${teacher.id})">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        // Update pagination
+        updateTeacherPagination(totalPages);
+        
+        // Update total count
+        document.getElementById('totalTeachers').textContent = `Total: ${filteredTeachers.length} teachers`;
+    }
+
+    // Update teacher pagination controls
+    function updateTeacherPagination(totalPages) {
+        const pagination = document.getElementById('teacherPagination');
+        const prevBtn = document.getElementById('teacherPrevPage');
+        const nextBtn = document.getElementById('teacherNextPage');
+        const pageInfo = document.getElementById('teacherPageInfo');
+        
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        pagination.style.display = 'flex';
+        pageInfo.textContent = `Page ${teacherCurrentPage} of ${totalPages}`;
+        
+        prevBtn.disabled = teacherCurrentPage === 1;
+        nextBtn.disabled = teacherCurrentPage === totalPages;
+    }
+
+    // Change teacher page
+    function changeTeacherPage(direction) {
+        const totalPages = Math.ceil(filteredTeachers.length / teachersPerPage);
+        const newPage = teacherCurrentPage + direction;
+        
+        if (newPage >= 1 && newPage <= totalPages) {
+            teacherCurrentPage = newPage;
+            updateTeachersTable();
+        }
+    }
+
+    // Filter teachers based on search and department filter
+    function filterTeachers() {
+        const searchTerm = document.getElementById('teacherSearchInput').value.toLowerCase();
+        const departmentFilter = document.getElementById('teacherDepartmentFilter').value;
+        
+        filteredTeachers = allTeachers.filter(teacher => {
+            // Search filter
+            const matchesSearch = !searchTerm || 
+                (teacher.name && teacher.name.toLowerCase().includes(searchTerm)) ||
+                (teacher.email && teacher.email.toLowerCase().includes(searchTerm)) ||
+                (teacher.teacher_code && teacher.teacher_code.toLowerCase().includes(searchTerm));
+            
+            // Department filter
+            const matchesDepartment = !departmentFilter || 
+                (teacher.department && teacher.department === departmentFilter);
+            
+            return matchesSearch && matchesDepartment;
+        });
+        
+        teacherCurrentPage = 1; // Reset to first page when filtering
+        updateTeachersTable();
+    }
+
+    // View teacher details
+    async function viewTeacher(teacherId) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/teachers/${teacherId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Teacher Details:\n\nName: ${data.teacher.name}\nEmail: ${data.teacher.email}\nCode: ${data.teacher.teacher_code}\nDepartment: ${data.teacher.department}\nSubjects: ${data.teacher.subjects}`);
+                }
+            }
+        } catch (error) {
+            console.error('Error viewing teacher:', error);
+            alert('Failed to load teacher details');
+        }
+    }
+
+    // ================= TEACHER CSV UPLOAD FUNCTIONALITY =================
+    let teacherSelectedFile = null;
+
+    // Initialize teacher file input listener
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('teacherCsvFileInput');
+        const fileNameDisplay = document.getElementById('teacherFileNameDisplay');
+        const selectedFileName = document.getElementById('teacherSelectedFileName');
+        const uploadBtn = document.getElementById('teacherUploadBtn');
+
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                teacherSelectedFile = e.target.files[0];
+                
+                // Validate file type
+                if (!teacherSelectedFile.name.toLowerCase().endsWith('.csv')) {
+                    showTeacherUploadStatus('Please select a CSV file', 'error');
+                    selectedFileName.style.display = 'none';
+                    uploadBtn.disabled = true;
+                    teacherSelectedFile = null;
+                    return;
+                }
+                
+                // Validate file size (5MB limit)
+                if (teacherSelectedFile.size > 5 * 1024 * 1024) {
+                    showTeacherUploadStatus('File size exceeds 5MB limit', 'error');
+                    selectedFileName.style.display = 'none';
+                    uploadBtn.disabled = true;
+                    teacherSelectedFile = null;
+                    return;
+                }
+                
+                fileNameDisplay.textContent = teacherSelectedFile.name + ' (' + formatFileSize(teacherSelectedFile.size) + ')';
+                selectedFileName.style.display = 'block';
+                uploadBtn.disabled = false;
+                showTeacherUploadStatus('File selected and ready for upload', 'success');
+            }
+        });
+    });
+
+    // Format file size for display
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Show teacher upload status message
+    function showTeacherUploadStatus(message, type = 'success') {
+        const statusDiv = document.getElementById('teacherUploadStatus');
+        statusDiv.textContent = message;
+        statusDiv.className = 'upload-status ' + type;
+        statusDiv.style.display = 'block';
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // Upload teacher CSV file
+    async function uploadTeacherCSV() {
+        if (!teacherSelectedFile) {
+            showTeacherUploadStatus('Please select a file first', 'error');
+            return;
+        }
+
+        const uploadBtn = document.getElementById('teacherUploadBtn');
+        const originalText = uploadBtn.innerHTML;
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            // Read CSV file
+            const text = await teacherSelectedFile.text();
+            console.log("Teacher CSV content (first 500 chars):", text.substring(0, 500));
+            
+            const rows = parseCSV(text);
+            console.log("Parsed teacher rows:", JSON.stringify(rows, null, 2));
+            
+            if (rows.length === 0) {
+                throw new Error('CSV file is empty or could not be parsed');
+            }
+            
+            // Validate first row has required fields
+            const firstRow = rows[0];
+            const requiredFields = ['teacher_code', 'name', 'email'];
+            const missingFields = requiredFields.filter(field => !firstRow[field]);
+            
+            if (missingFields.length > 0) {
+                throw new Error(`CSV is missing required columns: ${missingFields.join(', ')}. Make sure headers match exactly: teacher_code,name,email,mobile,faculty,department,subjects`);
+            }
+            
+            // Send to server
+            const response = await fetch('http://localhost:5000/api/upload-teachers', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rows)
+            });
+
+            const data = await response.json();
+            console.log("Teacher upload response:", data);
+
+            if (response.ok && data.success) {
+                showTeacherUploadStatus(`✅ ${data.message}`, 'success');
+                
+                // Reset file input
+                document.getElementById('teacherCsvFileInput').value = '';
+                document.getElementById('teacherSelectedFileName').style.display = 'none';
+                teacherSelectedFile = null;
+                uploadBtn.disabled = true;
+                
+                // Reload teachers data
+                await loadTeachersData();
+            } else {
+                const errorMsg = data.error || data.message || 'Upload failed';
+                showTeacherUploadStatus('❌ ' + errorMsg, 'error');
+                
+                // Show detailed errors if available
+                if (data.errors && data.errors.length > 0) {
+                    console.error("Detailed errors:", data.errors);
+                    setTimeout(() => {
+                        alert("Some rows had errors:\n" + data.errors.slice(0, 5).join("\n") + 
+                              (data.errors.length > 5 ? "\n...and " + (data.errors.length - 5) + " more" : ""));
+                    }, 1000);
+                }
+            }
+        } catch (error) {
+            console.error('Teacher upload error:', error);
+            showTeacherUploadStatus('❌ Upload failed: ' + error.message, 'error');
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload CSV';
+        }
+    }
+
+    // ================= STUDENTS MANAGEMENT =================
+    let allStudents = [];
+    let filteredStudents = [];
+    let studentCurrentPage = 1;
+    const studentsPerPage = 10;
+
+    // Load students data
+    async function loadStudentsData() {
+        showStudentLoading(true);
+        
+        try {
+            // Load faculties and departments for filters
+            await loadStudentFilters();
+            
+            // Load students
+            const studentsResponse = await fetch('http://localhost:5000/api/students', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const studentsData = await studentsResponse.json();
+            
+            if (studentsData.success) {
+                allStudents = studentsData.students || [];
+                filteredStudents = [...allStudents];
+                
+                updateStudentsTable();
+            } else {
+                throw new Error(studentsData.error || 'Failed to load students');
+            }
+            
+        } catch (error) {
+            console.error('Error loading students data:', error);
+            showStudentUploadStatus('❌ Failed to load students data: ' + error.message, 'error');
+            allStudents = [];
+            filteredStudents = [];
+            updateStudentsTable();
+        } finally {
+            showStudentLoading(false);
+        }
+    }
+
+    // Load student filters (faculties and departments)
+    async function loadStudentFilters() {
+        try {
+            // Load faculties
+            const facultiesResponse = await fetch('http://localhost:5000/api/faculties', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (facultiesResponse.ok) {
+                const facultiesData = await facultiesResponse.json();
+                if (facultiesData.success) {
+                    populateStudentFacultyFilter(facultiesData.faculties || []);
+                }
+            }
+            
+            // Load departments
+            const deptResponse = await fetch('http://localhost:5000/api/student-departments', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (deptResponse.ok) {
+                const deptData = await deptResponse.json();
+                if (deptData.success) {
+                    populateStudentDepartmentFilter(deptData.departments || []);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading student filters:', error);
+        }
+    }
+
+    // Populate student faculty filter dropdown
+    function populateStudentFacultyFilter(faculties) {
+        const facultyFilter = document.getElementById('studentFacultyFilter');
+        
+        // Clear existing options except the first one
+        while (facultyFilter.options.length > 1) {
+            facultyFilter.remove(1);
+        }
+        
+        // Add new options
+        faculties.forEach(faculty => {
+            if (faculty && faculty.trim() !== '') {
+                const option = document.createElement('option');
+                option.value = faculty;
+                option.textContent = faculty;
+                facultyFilter.appendChild(option);
+            }
+        });
+    }
+
+    // Populate student department filter dropdown
+    function populateStudentDepartmentFilter(departments) {
+        const departmentFilter = document.getElementById('studentDepartmentFilter');
+        
+        // Clear existing options except the first one
+        while (departmentFilter.options.length > 1) {
+            departmentFilter.remove(1);
+        }
+        
+        // Add new options
+        departments.forEach(dept => {
+            if (dept && dept.trim() !== '') {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                departmentFilter.appendChild(option);
+            }
+        });
+    }
+
+    // Show/hide student loading spinner
+    function showStudentLoading(show) {
+        const loadingSpinner = document.getElementById('studentLoadingSpinner');
+        const studentsTable = document.getElementById('studentsTable');
+        
+        if (show) {
+            loadingSpinner.style.display = 'block';
+            studentsTable.style.display = 'none';
+        } else {
+            loadingSpinner.style.display = 'none';
+            studentsTable.style.display = 'table';
+        }
+    }
+
+    // Update the students table
+    function updateStudentsTable() {
+        const tableBody = document.getElementById('studentsTableBody');
+        const noStudentsMessage = document.getElementById('noStudentsMessage');
+        const pagination = document.getElementById('studentPagination');
+        const studentsTable = document.getElementById('studentsTable');
+        
+        if (filteredStudents.length === 0) {
+            tableBody.innerHTML = '';
+            noStudentsMessage.style.display = 'block';
+            studentsTable.style.display = 'none';
+            pagination.style.display = 'none';
+            document.getElementById('totalStudents').textContent = 'Total: 0 students';
+            return;
+        }
+        
+        noStudentsMessage.style.display = 'none';
+        studentsTable.style.display = 'table';
+        
+        // Calculate pagination
+        const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+        const startIndex = (studentCurrentPage - 1) * studentsPerPage;
+        const endIndex = Math.min(startIndex + studentsPerPage, filteredStudents.length);
+        const pageStudents = filteredStudents.slice(startIndex, endIndex);
+        
+        // Clear table
+        tableBody.innerHTML = '';
+        
+        // Add rows
+        pageStudents.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="student-code">${student.student_code || 'N/A'}</td>
+                <td>${student.roll_no || 'N/A'}</td>
+                <td>${student.name || 'N/A'}</td>
+                <td>${student.email || 'N/A'}</td>
+                <td>
+                    <span class="faculty-badge">${student.faculty || 'Not Assigned'}</span>
+                </td>
+                <td>
+                    <span class="department-badge">${student.department || 'Not Assigned'}</span>
+                </td>
+                <td>
+                    <span class="stream-badge">${student.stream || 'N/A'}</span>
+                </td>
+                <td>${student.semester || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-btn" title="View" onclick="viewStudent(${student.id})">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        // Update pagination
+        updateStudentPagination(totalPages);
+        
+        // Update total count
+        document.getElementById('totalStudents').textContent = `Total: ${filteredStudents.length} students`;
+    }
+
+    // Update student pagination controls
+    function updateStudentPagination(totalPages) {
+        const pagination = document.getElementById('studentPagination');
+        const prevBtn = document.getElementById('studentPrevPage');
+        const nextBtn = document.getElementById('studentNextPage');
+        const pageInfo = document.getElementById('studentPageInfo');
+        
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        pagination.style.display = 'flex';
+        pageInfo.textContent = `Page ${studentCurrentPage} of ${totalPages}`;
+        
+        prevBtn.disabled = studentCurrentPage === 1;
+        nextBtn.disabled = studentCurrentPage === totalPages;
+    }
+
+    // Change student page
+    function changeStudentPage(direction) {
+        const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+        const newPage = studentCurrentPage + direction;
+        
+        if (newPage >= 1 && newPage <= totalPages) {
+            studentCurrentPage = newPage;
+            updateStudentsTable();
+        }
+    }
+
+    // Filter students based on search and filters
+    function filterStudents() {
+        const searchTerm = document.getElementById('studentSearchInput').value.toLowerCase();
+        const facultyFilter = document.getElementById('studentFacultyFilter').value;
+        const departmentFilter = document.getElementById('studentDepartmentFilter').value;
+        
+        filteredStudents = allStudents.filter(student => {
+            // Search filter
+            const matchesSearch = !searchTerm || 
+                (student.name && student.name.toLowerCase().includes(searchTerm)) ||
+                (student.email && student.email.toLowerCase().includes(searchTerm)) ||
+                (student.student_code && student.student_code.toLowerCase().includes(searchTerm)) ||
+                (student.roll_no && student.roll_no.toLowerCase().includes(searchTerm));
+            
+            // Faculty filter
+            const matchesFaculty = !facultyFilter || 
+                (student.faculty && student.faculty === facultyFilter);
+            
+            // Department filter
+            const matchesDepartment = !departmentFilter || 
+                (student.department && student.department === departmentFilter);
+            
+            return matchesSearch && matchesFaculty && matchesDepartment;
+        });
+        
+        studentCurrentPage = 1; // Reset to first page when filtering
+        updateStudentsTable();
+    }
+
+    // View student details
+    async function viewStudent(studentId) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/students/${studentId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Student Details:\n\nName: ${data.student.name}\nEmail: ${data.student.email}\nCode: ${data.student.student_code}\nRoll No: ${data.student.roll_no}\nDepartment: ${data.student.department}\nFaculty: ${data.student.faculty}\nStream: ${data.student.stream}\nSemester: ${data.student.semester}`);
+                }
+            }
+        } catch (error) {
+            console.error('Error viewing student:', error);
+            alert('Failed to load student details');
+        }
+    }
+
+    // ================= STUDENT CSV UPLOAD FUNCTIONALITY =================
+    let studentSelectedFile = null;
+
+    // Initialize student file input listener
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('studentCsvFileInput');
+        const fileNameDisplay = document.getElementById('studentFileNameDisplay');
+        const selectedFileName = document.getElementById('studentSelectedFileName');
+        const uploadBtn = document.getElementById('studentUploadBtn');
+
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                studentSelectedFile = e.target.files[0];
+                
+                // Validate file type
+                if (!studentSelectedFile.name.toLowerCase().endsWith('.csv')) {
+                    showStudentUploadStatus('Please select a CSV file', 'error');
+                    selectedFileName.style.display = 'none';
+                    uploadBtn.disabled = true;
+                    studentSelectedFile = null;
+                    return;
+                }
+                
+                // Validate file size (5MB limit)
+                if (studentSelectedFile.size > 5 * 1024 * 1024) {
+                    showStudentUploadStatus('File size exceeds 5MB limit', 'error');
+                    selectedFileName.style.display = 'none';
+                    uploadBtn.disabled = true;
+                    studentSelectedFile = null;
+                    return;
+                }
+                
+                fileNameDisplay.textContent = studentSelectedFile.name + ' (' + formatFileSize(studentSelectedFile.size) + ')';
+                selectedFileName.style.display = 'block';
+                uploadBtn.disabled = false;
+                showStudentUploadStatus('File selected and ready for upload', 'success');
+            }
+        });
+    });
+
+    // Show student upload status message
+    function showStudentUploadStatus(message, type = 'success') {
+        const statusDiv = document.getElementById('studentUploadStatus');
+        statusDiv.textContent = message;
+        statusDiv.className = 'upload-status ' + type;
+        statusDiv.style.display = 'block';
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // Upload student CSV file
+    async function uploadStudentCSV() {
+        if (!studentSelectedFile) {
+            showStudentUploadStatus('Please select a file first', 'error');
+            return;
+        }
+
+        const uploadBtn = document.getElementById('studentUploadBtn');
+        const originalText = uploadBtn.innerHTML;
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            // Read CSV file
+            const text = await studentSelectedFile.text();
+            console.log("Student CSV content (first 500 chars):", text.substring(0, 500));
+            
+            const rows = parseStudentCSV(text);
+            console.log("Parsed student rows:", JSON.stringify(rows, null, 2));
+            
+            if (rows.length === 0) {
+                throw new Error('CSV file is empty or could not be parsed');
+            }
+            
+            // Validate first row has required fields
+            const firstRow = rows[0];
+            const requiredFields = ['roll_no', 'name', 'email'];
+            const missingFields = requiredFields.filter(field => !firstRow[field]);
+            
+            if (missingFields.length > 0) {
+                throw new Error(`CSV is missing required columns: ${missingFields.join(', ')}. Make sure headers match exactly: roll_no,name,email,mobile,faculty,department,stream,division,semester,academic_year,subjects`);
+            }
+            
+            // Send to server
+            const response = await fetch('http://localhost:5000/api/upload-students', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rows)
+            });
+
+            const data = await response.json();
+            console.log("Student upload response:", data);
+
+            if (response.ok && data.success) {
+                showStudentUploadStatus(`✅ ${data.message}`, 'success');
+                
+                // Reset file input
+                document.getElementById('studentCsvFileInput').value = '';
+                document.getElementById('studentSelectedFileName').style.display = 'none';
+                studentSelectedFile = null;
+                uploadBtn.disabled = true;
+                
+                // Reload students data
+                await loadStudentsData();
+            } else {
+                const errorMsg = data.error || data.message || 'Upload failed';
+                showStudentUploadStatus('❌ ' + errorMsg, 'error');
+                
+                // Show detailed errors if available
+                if (data.errors && data.errors.length > 0) {
+                    console.error("Detailed errors:", data.errors);
+                    setTimeout(() => {
+                        alert("Some rows had errors:\n" + data.errors.slice(0, 5).join("\n") + 
+                              (data.errors.length > 5 ? "\n...and " + (data.errors.length - 5) + " more" : ""));
+                    }, 1000);
+                }
+            }
+        } catch (error) {
+            console.error('Student upload error:', error);
+            showStudentUploadStatus('❌ Upload failed: ' + error.message, 'error');
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload CSV';
+        }
+    }
+
+    // ================= CLASS MANAGEMENT =================
+    let allClasses = [];
+    let filteredClasses = [];
+    let classCurrentPage = 1;
+    const classesPerPage = 10;
+
+    // Load classes data
+    async function loadClassesData() {
+        showClassLoading(true);
+        
+        try {
+            // Load classes
+            const classesResponse = await fetch('http://localhost:5000/api/classes', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const classesData = await classesResponse.json();
+            
+            if (classesData.success) {
+                allClasses = classesData.classes || [];
+                filteredClasses = [...allClasses];
+                
+                // Populate filters
+                populateClassFilters();
+                
+                updateClassesTable();
+            } else {
+                throw new Error(classesData.error || 'Failed to load classes');
+            }
+            
+        } catch (error) {
+            console.error('Error loading classes data:', error);
+            showClassStatus('❌ Failed to load classes: ' + error.message, 'error');
+            allClasses = [];
+            filteredClasses = [];
+            updateClassesTable();
+        } finally {
+            showClassLoading(false);
+        }
+    }
+
+    // Populate class filters dropdown
+    function populateClassFilters() {
+        // Faculty filter
+        const facultyFilter = document.getElementById('classFacultyFilter');
+        while (facultyFilter.options.length > 1) {
+            facultyFilter.remove(1);
+        }
+        
+        // Department filter
+        const departmentFilter = document.getElementById('classDepartmentFilter');
+        while (departmentFilter.options.length > 1) {
+            departmentFilter.remove(1);
+        }
+        
+        // Stream filter
+        const streamFilter = document.getElementById('classStreamFilter');
+        while (streamFilter.options.length > 1) {
+            streamFilter.remove(1);
+        }
+        
+        // Get unique values from classes
+        const faculties = [...new Set(allClasses
+            .filter(cls => cls.faculty && cls.faculty.trim() !== '')
+            .map(cls => cls.faculty))].sort();
+        
+        const departments = [...new Set(allClasses
+            .filter(cls => cls.department && cls.department.trim() !== '')
+            .map(cls => cls.department))].sort();
+        
+        const streams = [...new Set(allClasses
+            .filter(cls => cls.stream && cls.stream.trim() !== '')
+            .map(cls => cls.stream))].sort();
+        
+        // Add new options
+        faculties.forEach(faculty => {
+            const option = document.createElement('option');
+            option.value = faculty;
+            option.textContent = faculty;
+            facultyFilter.appendChild(option);
+        });
+        
+        departments.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept;
+            option.textContent = dept;
+            departmentFilter.appendChild(option);
+        });
+        
+        streams.forEach(stream => {
+            const option = document.createElement('option');
+            option.value = stream;
+            option.textContent = stream;
+            streamFilter.appendChild(option);
+        });
+    }
+
+    // Show/hide class loading spinner
+    function showClassLoading(show) {
+        const loadingSpinner = document.getElementById('classLoadingSpinner');
+        const classesTable = document.getElementById('classesTable');
+        
+        if (show) {
+            loadingSpinner.style.display = 'block';
+            classesTable.style.display = 'none';
+        } else {
+            loadingSpinner.style.display = 'none';
+            classesTable.style.display = 'table';
+        }
+    }
+
+    // Update the classes table
+    function updateClassesTable() {
+        const tableBody = document.getElementById('classesTableBody');
+        const noClassesMessage = document.getElementById('noClassesMessage');
+        const pagination = document.getElementById('classPagination');
+        const classesTable = document.getElementById('classesTable');
+        
+        if (filteredClasses.length === 0) {
+            tableBody.innerHTML = '';
+            noClassesMessage.style.display = 'block';
+            classesTable.style.display = 'none';
+            pagination.style.display = 'none';
+            document.getElementById('totalClasses').textContent = 'Total: 0 classes';
+            return;
+        }
+        
+        noClassesMessage.style.display = 'none';
+        classesTable.style.display = 'table';
+        
+        // Calculate pagination
+        const totalPages = Math.ceil(filteredClasses.length / classesPerPage);
+        const startIndex = (classCurrentPage - 1) * classesPerPage;
+        const endIndex = Math.min(startIndex + classesPerPage, filteredClasses.length);
+        const pageClasses = filteredClasses.slice(startIndex, endIndex);
+        
+        // Clear table
+        tableBody.innerHTML = '';
+        
+        // Add rows
+        pageClasses.forEach(cls => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="class-code">${cls.class_code || 'N/A'}</td>
+                <td>${cls.class_name || 'N/A'}</td>
+                <td>${cls.faculty || 'N/A'}</td>
+                <td>
+                    <span class="department-badge">${cls.department || 'Not Assigned'}</span>
+                </td>
+                <td>${cls.stream || 'N/A'}</td>
+                <td>${cls.semester || 'N/A'}</td>
+                <td><span class="stats-badge">${cls.student_count || 0} students</span></td>
+                <td><span class="stats-badge">${cls.teacher_count || 0} teachers</span></td>
+                <td>
+                    <button class="action-btn view-btn" title="View Details" onclick="viewClassDetails(${cls.id})">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="action-btn assign-btn" title="Assign Teacher" onclick="showAssignTeacherModal(${cls.id}, '${cls.class_name}')">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                    <button class="action-btn delete-btn" title="Delete Class" onclick="deleteClass(${cls.id}, '${cls.class_name}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        // Update pagination
+        updateClassPagination(totalPages);
+        
+        // Update total count
+        document.getElementById('totalClasses').textContent = `Total: ${filteredClasses.length} classes`;
+    }
+
+    // Update class pagination controls
+    function updateClassPagination(totalPages) {
+        const pagination = document.getElementById('classPagination');
+        const prevBtn = document.getElementById('classPrevPage');
+        const nextBtn = document.getElementById('classNextPage');
+        const pageInfo = document.getElementById('classPageInfo');
+        
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        pagination.style.display = 'flex';
+        pageInfo.textContent = `Page ${classCurrentPage} of ${totalPages}`;
+        
+        prevBtn.disabled = classCurrentPage === 1;
+        nextBtn.disabled = classCurrentPage === totalPages;
+    }
+
+    // Change class page
+    function changeClassPage(direction) {
+        const totalPages = Math.ceil(filteredClasses.length / classesPerPage);
+        const newPage = classCurrentPage + direction;
+        
+        if (newPage >= 1 && newPage <= totalPages) {
+            classCurrentPage = newPage;
+            updateClassesTable();
+        }
+    }
+
+    // Filter classes based on search and filters
+    function filterClasses() {
+        const searchTerm = document.getElementById('classSearchInput').value.toLowerCase();
+        const facultyFilter = document.getElementById('classFacultyFilter').value;
+        const departmentFilter = document.getElementById('classDepartmentFilter').value;
+        const streamFilter = document.getElementById('classStreamFilter').value;
+        const semesterFilter = document.getElementById('classSemesterFilter').value;
+        
+        filteredClasses = allClasses.filter(cls => {
+            // Search filter
+            const matchesSearch = !searchTerm || 
+                (cls.class_name && cls.class_name.toLowerCase().includes(searchTerm)) ||
+                (cls.class_code && cls.class_code.toLowerCase().includes(searchTerm)) ||
+                (cls.department && cls.department.toLowerCase().includes(searchTerm));
+            
+            // Faculty filter
+            const matchesFaculty = !facultyFilter || 
+                (cls.faculty && cls.faculty === facultyFilter);
+            
+            // Department filter
+            const matchesDepartment = !departmentFilter || 
+                (cls.department && cls.department === departmentFilter);
+            
+            // Stream filter
+            const matchesStream = !streamFilter || 
+                (cls.stream && cls.stream === streamFilter);
+            
+            // Semester filter
+            const matchesSemester = !semesterFilter || 
+                (cls.semester && cls.semester.toString() === semesterFilter);
+            
+            return matchesSearch && matchesFaculty && matchesDepartment && matchesStream && matchesSemester;
+        });
+        
+        classCurrentPage = 1; // Reset to first page when filtering
+        updateClassesTable();
+    }
+
+    // Show class status message
+    function showClassStatus(message, type = 'success') {
+        const statusDiv = document.getElementById('classStatus');
+        statusDiv.textContent = message;
+        statusDiv.className = 'upload-status ' + type;
+        statusDiv.style.display = 'block';
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // ================= CLASS MODAL FUNCTIONS =================
+    let selectedStudentsForClass = [];
+
+    function showCreateClassModal() {
+        // Load filters for modal
+        loadCreateClassFilters();
+        document.getElementById('createClassModal').classList.add('active');
+    }
+
+    function hideCreateClassModal() {
+        document.getElementById('createClassModal').classList.remove('active');
+        // Clear form
+        document.getElementById('modalClassFaculty').value = '';
+        document.getElementById('modalClassDepartment').value = '';
+        document.getElementById('modalClassStream').value = '';
+        document.getElementById('modalClassDivision').value = '';
+        document.getElementById('modalClassSemester').value = '';
+        document.getElementById('modalClassAcademicYear').value = '2025-26';
+        document.getElementById('modalClassSubjects').value = '';
+        document.getElementById('studentCodeInput').value = '';
+        document.getElementById('studentsPreview').style.display = 'none';
+        document.getElementById('noStudentsFound').style.display = 'none';
+        selectedStudentsForClass = [];
+    }
+
+    // Load filters for create class modal
+    async function loadCreateClassFilters() {
+        try {
+            // Load faculties
+            const facultiesResponse = await fetch('http://localhost:5000/api/faculties', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (facultiesResponse.ok) {
+                const facultiesData = await facultiesResponse.json();
+                if (facultiesData.success) {
+                    const facultySelect = document.getElementById('modalClassFaculty');
+                    while (facultySelect.options.length > 1) {
+                        facultySelect.remove(1);
+                    }
+                    
+                    facultiesData.faculties.forEach(faculty => {
+                        if (faculty && faculty.trim() !== '') {
+                            const option = document.createElement('option');
+                            option.value = faculty;
+                            option.textContent = faculty;
+                            facultySelect.appendChild(option);
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading filters:', error);
+        }
+    }
+
+    // Update departments based on selected faculty
+    async function updateFacultyDepartments() {
+        const faculty = document.getElementById('modalClassFaculty').value;
+        if (!faculty) return;
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/student-departments?faculty=${encodeURIComponent(faculty)}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    const deptSelect = document.getElementById('modalClassDepartment');
+                    while (deptSelect.options.length > 1) {
+                        deptSelect.remove(1);
+                    }
+                    
+                    data.departments.forEach(dept => {
+                        if (dept && dept.trim() !== '') {
+                            const option = document.createElement('option');
+                            option.value = dept;
+                            option.textContent = dept;
+                            deptSelect.appendChild(option);
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading departments:', error);
+        }
+    }
+
+    // Update streams based on selected department
+    async function updateDepartmentStreams() {
+        const department = document.getElementById('modalClassDepartment').value;
+        if (!department) return;
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/streams?department=${encodeURIComponent(department)}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    const streamSelect = document.getElementById('modalClassStream');
+                    while (streamSelect.options.length > 1) {
+                        streamSelect.remove(1);
+                    }
+                    
+                    data.streams.forEach(stream => {
+                        if (stream && stream.trim() !== '') {
+                            const option = document.createElement('option');
+                            option.value = stream;
+                            option.textContent = stream;
+                            streamSelect.appendChild(option);
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            // If endpoint doesn't exist, just clear the stream select
+            const streamSelect = document.getElementById('modalClassStream');
+            while (streamSelect.options.length > 1) {
+                streamSelect.remove(1);
+            }
+        }
+    }
+
+    // Fetch students by student code
+    async function fetchStudentsByCode() {
+        const studentCode = document.getElementById('studentCodeInput').value.trim();
+        if (!studentCode) {
+            alert('Please enter a student code');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/students-by-code/${encodeURIComponent(studentCode)}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.students && data.students.length > 0) {
+                    selectedStudentsForClass = data.students;
+                    displaySelectedStudents(data.students);
+                    document.getElementById('studentsPreview').style.display = 'block';
+                    document.getElementById('noStudentsFound').style.display = 'none';
+                    
+                    // Auto-fill class details from the first student
+                    if (data.students.length > 0) {
+                        const student = data.students[0];
+                        document.getElementById('modalClassFaculty').value = student.faculty || '';
+                        document.getElementById('modalClassDepartment').value = student.department || '';
+                        document.getElementById('modalClassStream').value = student.stream || '';
+                        document.getElementById('modalClassDivision').value = student.division || '';
+                        document.getElementById('modalClassSemester').value = student.semester || '';
+                        document.getElementById('modalClassAcademicYear').value = student.academic_year || '2025-26';
+                        document.getElementById('modalClassSubjects').value = student.subjects || '';
+                    }
+                } else {
+                    document.getElementById('studentsPreview').style.display = 'none';
+                    document.getElementById('noStudentsFound').style.display = 'block';
+                    selectedStudentsForClass = [];
+                }
+            } else {
+                throw new Error('Failed to fetch students');
+            }
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            alert('Failed to fetch students: ' + error.message);
+            document.getElementById('studentsPreview').style.display = 'none';
+            document.getElementById('noStudentsFound').style.display = 'block';
+            selectedStudentsForClass = [];
+        }
+    }
+
+    // Display selected students
+    function displaySelectedStudents(students) {
+        const previewList = document.getElementById('previewStudentsList');
+        previewList.innerHTML = '';
+        
+        students.forEach(student => {
+            const studentItem = document.createElement('div');
+            studentItem.className = 'student-preview-item';
+            studentItem.innerHTML = `
+                <strong>${student.name}</strong>
+                <br>
+                <small>Code: ${student.student_code} | Roll No: ${student.roll_no} | Email: ${student.email}</small>
+            `;
+            previewList.appendChild(studentItem);
+        });
+        
+        const countItem = document.createElement('div');
+        countItem.className = 'student-preview-item';
+        countItem.style.background = 'var(--accent-color)';
+        countItem.style.color = 'white';
+        countItem.innerHTML = `<strong>Total: ${students.length} students found</strong>`;
+        previewList.appendChild(countItem);
+    }
+
+    // Create class with selected students
+    async function createClassWithStudents() {
+        const faculty = document.getElementById('modalClassFaculty').value.trim();
+        const department = document.getElementById('modalClassDepartment').value.trim();
+        const stream = document.getElementById('modalClassStream').value.trim();
+        const division = document.getElementById('modalClassDivision').value.trim();
+        const semester = document.getElementById('modalClassSemester').value;
+        const academicYear = document.getElementById('modalClassAcademicYear').value.trim();
+        const subjects = document.getElementById('modalClassSubjects').value.trim();
+
+        if (!faculty || !department) {
+            alert('Faculty and Department are required');
+            return;
+        }
+
+        if (selectedStudentsForClass.length === 0) {
+            alert('No students selected. Please fetch students using a student code first.');
+            return;
+        }
+
+        try {
+            // Create class
+            const classResponse = await fetch('http://localhost:5000/api/classes', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    faculty: faculty,
+                    department: department,
+                    stream: stream || null,
+                    division: division || null,
+                    semester: semester || null,
+                    academic_year: academicYear || '2025-26',
+                    subjects: subjects || null
+                })
+            });
+
+            const classData = await classResponse.json();
+
+            if (classResponse.ok && classData.success) {
+                const classId = classData.class.id;
+                
+                // Enroll students in the class
+                await enrollStudentsInClass(classId, selectedStudentsForClass);
+                
+                showClassStatus(`✅ Class created successfully with ${selectedStudentsForClass.length} students`, 'success');
+                hideCreateClassModal();
+                loadClassesData(); // Reload classes
+            } else {
+                throw new Error(classData.error || classData.message || 'Failed to create class');
+            }
+        } catch (error) {
+            console.error('Error creating class with students:', error);
+            showClassStatus('❌ Failed to create class: ' + error.message, 'error');
+        }
+    }
+
+    // Enroll students in class
+    async function enrollStudentsInClass(classId, students) {
+        for (const student of students) {
+            try {
+                const response = await fetch('http://localhost:5000/api/enroll-student', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        class_id: classId,
+                        student_id: student.id,
+                        student_code: student.student_code,
+                        enrolled_subjects: student.subjects || ''
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error(`Failed to enroll student ${student.student_code}`);
+                }
+            } catch (error) {
+                console.error(`Error enrolling student ${student.student_code}:`, error);
+            }
+        }
+    }
+
+    // ================= TEACHER ASSIGNMENT FUNCTIONS =================
+
+    // Show assign teacher modal
+    async function showAssignTeacherModal(classId, className) {
+        document.getElementById('assignClassId').value = classId;
+        document.getElementById('assignClassName').value = className;
+        
+        try {
+            // Load teachers for dropdown
+            const response = await fetch('http://localhost:5000/api/teachers', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                const teacherSelect = document.getElementById('assignTeacherId');
+                // Clear existing options except the first one
+                while (teacherSelect.options.length > 1) {
+                    teacherSelect.remove(1);
+                }
+                
+                // Add teacher options
+                data.teachers.forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher.id;
+                    option.textContent = `${teacher.name} (${teacher.teacher_code}) - ${teacher.department || 'No Department'}`;
+                    option.setAttribute('data-subjects', teacher.subjects || '');
+                    teacherSelect.appendChild(option);
+                });
+                
+                // Reset subjects section
+                document.getElementById('teacherSubjectsContainer').style.display = 'none';
+                document.getElementById('teacherSubjectsList').innerHTML = '';
+                document.getElementById('noSubjectsMessage').style.display = 'none';
+                document.getElementById('loadingSubjects').style.display = 'none';
+                document.getElementById('assignTeacherBtn').disabled = true;
+                
+                // Show modal
+                document.getElementById('assignTeacherModal').classList.add('active');
+            }
+        } catch (error) {
+            console.error('Error loading teachers:', error);
+            alert('Failed to load teachers');
+        }
+    }
+
+    // Load teacher's subjects when teacher is selected
+    async function loadTeacherSubjects() {
+        const teacherId = document.getElementById('assignTeacherId').value;
+        const subjectsContainer = document.getElementById('teacherSubjectsContainer');
+        const subjectsList = document.getElementById('teacherSubjectsList');
+        const noSubjectsMessage = document.getElementById('noSubjectsMessage');
+        const loadingSpinner = document.getElementById('loadingSubjects');
+        const assignBtn = document.getElementById('assignTeacherBtn');
+        
+        // Reset
+        subjectsList.innerHTML = '';
+        assignBtn.disabled = true;
+        
+        if (!teacherId) {
+            subjectsContainer.style.display = 'none';
+            return;
+        }
+        
+        // Show loading
+        loadingSpinner.style.display = 'block';
+        subjectsContainer.style.display = 'none';
+        noSubjectsMessage.style.display = 'none';
+        
+        try {
+            // Get teacher details including subjects
+            const response = await fetch(`http://localhost:5000/api/teachers/${teacherId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+            
+            loadingSpinner.style.display = 'none';
+            
+            if (data.success && data.teacher) {
+                const teacher = data.teacher;
+                const subjects = teacher.subjects || '';
+                
+                if (subjects) {
+                    // Parse subjects (comma-separated string)
+                    const subjectArray = subjects.split(',').map(s => s.trim()).filter(s => s !== '');
+                    
+                    if (subjectArray.length > 0) {
+                        // Create checkboxes for each subject
+                        subjectsList.innerHTML = '';
+                        
+                        subjectArray.forEach((subject, index) => {
+                            const checkboxId = `subject-${index}`;
+                            const checkbox = document.createElement('div');
+                            checkbox.className = 'subject-checkbox-item';
+                            checkbox.innerHTML = `
+                                <input type="checkbox" id="${checkboxId}" value="${subject}" checked>
+                                <label for="${checkboxId}">${subject}</label>
+                            `;
+                            subjectsList.appendChild(checkbox);
+                        });
+                        
+                        // Add "Select All" option
+                        const selectAllDiv = document.createElement('div');
+                        selectAllDiv.className = 'subject-checkbox-item select-all';
+                        selectAllDiv.innerHTML = `
+                            <input type="checkbox" id="selectAllSubjects" checked>
+                            <label for="selectAllSubjects"><strong>Select All</strong></label>
+                        `;
+                        subjectsList.appendChild(selectAllDiv);
+                        
+                        // Add event listener for "Select All"
+                        document.getElementById('selectAllSubjects').addEventListener('change', function() {
+                            const allCheckboxes = subjectsList.querySelectorAll('input[type="checkbox"]:not(#selectAllSubjects)');
+                            allCheckboxes.forEach(checkbox => {
+                                checkbox.checked = this.checked;
+                            });
+                        });
+                        
+                        // Add event listener to individual checkboxes to update "Select All"
+                        subjectsList.querySelectorAll('input[type="checkbox"]:not(#selectAllSubjects)').forEach(checkbox => {
+                            checkbox.addEventListener('change', updateSelectAllCheckbox);
+                        });
+                        
+                        subjectsContainer.style.display = 'block';
+                        noSubjectsMessage.style.display = 'none';
+                        assignBtn.disabled = false;
+                    } else {
+                        noSubjectsMessage.style.display = 'block';
+                        subjectsContainer.style.display = 'none';
+                        assignBtn.disabled = true;
+                    }
+                } else {
+                    noSubjectsMessage.style.display = 'block';
+                    subjectsContainer.style.display = 'none';
+                    assignBtn.disabled = true;
+                }
+            } else {
+                noSubjectsMessage.style.display = 'block';
+                subjectsContainer.style.display = 'none';
+                assignBtn.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error loading teacher subjects:', error);
+            loadingSpinner.style.display = 'none';
+            subjectsContainer.style.display = 'none';
+            assignBtn.disabled = true;
+            
+            // Show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'upload-status error';
+            errorDiv.textContent = 'Failed to load teacher subjects';
+            subjectsList.innerHTML = '';
+            subjectsList.appendChild(errorDiv);
+            subjectsContainer.style.display = 'block';
+        }
+    }
+
+    // Update "Select All" checkbox based on individual selections
+    function updateSelectAllCheckbox() {
+        const subjectsList = document.getElementById('teacherSubjectsList');
+        const allCheckboxes = subjectsList.querySelectorAll('input[type="checkbox"]:not(#selectAllSubjects)');
+        const selectAllCheckbox = document.getElementById('selectAllSubjects');
+        
+        if (selectAllCheckbox) {
+            const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+            selectAllCheckbox.checked = checkedCount === allCheckboxes.length;
+            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+        }
+    }
+
+    function hideAssignTeacherModal() {
+        document.getElementById('assignTeacherModal').classList.remove('active');
+        // Clear form
+        document.getElementById('assignClassId').value = '';
+        document.getElementById('assignClassName').value = '';
+        document.getElementById('assignTeacherId').value = '';
+        document.getElementById('teacherSubjectsList').innerHTML = '';
+        document.getElementById('teacherSubjectsContainer').style.display = 'none';
+        document.getElementById('noSubjectsMessage').style.display = 'none';
+        document.getElementById('loadingSubjects').style.display = 'none';
+        document.getElementById('assignIsPrimary').checked = false;
+        document.getElementById('assignTeacherBtn').disabled = true;
+    }
+
+    // Assign teacher to class
+    async function assignTeacher() {
+        const classId = document.getElementById('assignClassId').value;
+        const teacherId = document.getElementById('assignTeacherId').value;
+        const isPrimary = document.getElementById('assignIsPrimary').checked;
+
+        if (!classId || !teacherId) {
+            alert('Class and teacher are required');
+            return;
+        }
+
+        // Get selected subjects from checkboxes
+        const selectedSubjects = [];
+        const checkboxes = document.querySelectorAll('#teacherSubjectsList input[type="checkbox"]:not(#selectAllSubjects)');
+        
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedSubjects.push(checkbox.value);
+            }
+        });
+
+        if (selectedSubjects.length === 0) {
+            alert('Please select at least one subject');
+            return;
+        }
+
+        const subjects = selectedSubjects.join(', ');
+
+        try {
+            const response = await fetch('http://localhost:5000/api/assign-teacher', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    class_id: classId,
+                    teacher_id: teacherId,
+                    subjects: subjects,
+                    is_primary: isPrimary
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showClassStatus(`✅ Teacher assigned successfully to teach: ${subjects}`, 'success');
+                hideAssignTeacherModal();
+                loadClassesData(); // Reload classes
+            } else {
+                throw new Error(data.error || data.message || 'Failed to assign teacher');
+            }
+        } catch (error) {
+            console.error('Error assigning teacher:', error);
+            showClassStatus('❌ Failed to assign teacher: ' + error.message, 'error');
+        }
+    }
+
+    // Show update teacher modal
+    async function showUpdateTeacherModal(assignmentId, classId, className, teacherId, teacherName, currentSubjects, isPrimary) {
+        document.getElementById('updateAssignmentId').value = assignmentId;
+        document.getElementById('updateClassId').value = classId;
+        document.getElementById('updateClassName').value = className;
+        document.getElementById('updateTeacherId').value = teacherId;
+        document.getElementById('updateTeacherName').value = teacherName;
+        document.getElementById('updateIsPrimary').checked = isPrimary;
+        
+        // Show loading
+        document.getElementById('updateLoadingSubjects').style.display = 'block';
+        document.getElementById('updateTeacherSubjectsList').innerHTML = '';
+        document.getElementById('updateNoSubjectsMessage').style.display = 'none';
+        
+        try {
+            // Get teacher details including subjects
+            const response = await fetch(`http://localhost:5000/api/teachers/${teacherId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+            
+            document.getElementById('updateLoadingSubjects').style.display = 'none';
+            
+            if (data.success && data.teacher) {
+                const teacher = data.teacher;
+                const allSubjects = teacher.subjects || '';
+                const currentSubjectsArray = currentSubjects.split(',').map(s => s.trim()).filter(s => s !== '');
+                
+                if (allSubjects) {
+                    // Parse all subjects (comma-separated string)
+                    const allSubjectsArray = allSubjects.split(',').map(s => s.trim()).filter(s => s !== '');
+                    
+                    if (allSubjectsArray.length > 0) {
+                        // Create checkboxes for each subject
+                        const subjectsList = document.getElementById('updateTeacherSubjectsList');
+                        subjectsList.innerHTML = '';
+                        
+                        allSubjectsArray.forEach((subject, index) => {
+                            const checkboxId = `update-subject-${index}`;
+                            const isChecked = currentSubjectsArray.includes(subject);
+                            const checkbox = document.createElement('div');
+                            checkbox.className = 'subject-checkbox-item';
+                            checkbox.innerHTML = `
+                                <input type="checkbox" id="${checkboxId}" value="${subject}" ${isChecked ? 'checked' : ''}>
+                                <label for="${checkboxId}">${subject}</label>
+                            `;
+                            subjectsList.appendChild(checkbox);
+                        });
+                        
+                        // Add "Select All" option
+                        const selectAllDiv = document.createElement('div');
+                        selectAllDiv.className = 'subject-checkbox-item select-all';
+                        selectAllDiv.innerHTML = `
+                            <input type="checkbox" id="updateSelectAllSubjects" checked>
+                            <label for="updateSelectAllSubjects"><strong>Select All</strong></label>
+                        `;
+                        subjectsList.appendChild(selectAllDiv);
+                        
+                        // Add event listener for "Select All"
+                        document.getElementById('updateSelectAllSubjects').addEventListener('change', function() {
+                            const allCheckboxes = subjectsList.querySelectorAll('input[type="checkbox"]:not(#updateSelectAllSubjects)');
+                            allCheckboxes.forEach(checkbox => {
+                                checkbox.checked = this.checked;
+                            });
+                        });
+                        
+                        // Add event listener to individual checkboxes to update "Select All"
+                        subjectsList.querySelectorAll('input[type="checkbox"]:not(#updateSelectAllSubjects)').forEach(checkbox => {
+                            checkbox.addEventListener('change', function() {
+                                updateUpdateSelectAllCheckbox();
+                            });
+                        });
+                        
+                        // Update "Select All" checkbox initially
+                        updateUpdateSelectAllCheckbox();
+                        
+                        document.getElementById('updateNoSubjectsMessage').style.display = 'none';
+                    } else {
+                        document.getElementById('updateNoSubjectsMessage').style.display = 'block';
+                    }
+                } else {
+                    document.getElementById('updateNoSubjectsMessage').style.display = 'block';
+                }
+            } else {
+                document.getElementById('updateNoSubjectsMessage').style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error loading teacher subjects for update:', error);
+            document.getElementById('updateLoadingSubjects').style.display = 'none';
+            document.getElementById('updateNoSubjectsMessage').style.display = 'block';
+        }
+        
+        // Show modal
+        document.getElementById('updateTeacherModal').classList.add('active');
+    }
+
+    // Update "Select All" checkbox for update modal
+    function updateUpdateSelectAllCheckbox() {
+        const subjectsList = document.getElementById('updateTeacherSubjectsList');
+        const allCheckboxes = subjectsList.querySelectorAll('input[type="checkbox"]:not(#updateSelectAllSubjects)');
+        const selectAllCheckbox = document.getElementById('updateSelectAllSubjects');
+        
+        if (selectAllCheckbox) {
+            const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+            selectAllCheckbox.checked = checkedCount === allCheckboxes.length;
+            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+        }
+    }
+
+    function hideUpdateTeacherModal() {
+        document.getElementById('updateTeacherModal').classList.remove('active');
+        // Clear form
+        document.getElementById('updateAssignmentId').value = '';
+        document.getElementById('updateClassId').value = '';
+        document.getElementById('updateClassName').value = '';
+        document.getElementById('updateTeacherId').value = '';
+        document.getElementById('updateTeacherName').value = '';
+        document.getElementById('updateTeacherSubjectsList').innerHTML = '';
+        document.getElementById('updateIsPrimary').checked = false;
+        document.getElementById('updateLoadingSubjects').style.display = 'none';
+        document.getElementById('updateNoSubjectsMessage').style.display = 'none';
+    }
+
+    // Update teacher assignment
+    async function updateTeacherAssignment() {
+        const assignmentId = document.getElementById('updateAssignmentId').value;
+        const classId = document.getElementById('updateClassId').value;
+        const teacherId = document.getElementById('updateTeacherId').value;
+        const isPrimary = document.getElementById('updateIsPrimary').checked;
+
+        if (!assignmentId || !classId || !teacherId) {
+            alert('Missing required information');
+            return;
+        }
+
+        // Get selected subjects from checkboxes
+        const selectedSubjects = [];
+        const checkboxes = document.querySelectorAll('#updateTeacherSubjectsList input[type="checkbox"]:not(#updateSelectAllSubjects)');
+        
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedSubjects.push(checkbox.value);
+            }
+        });
+
+        if (selectedSubjects.length === 0) {
+            alert('Please select at least one subject');
+            return;
+        }
+
+        const subjects = selectedSubjects.join(', ');
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/class-teachers/${assignmentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    subjects: subjects,
+                    is_primary: isPrimary
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showClassStatus(`✅ Teacher assignment updated successfully`, 'success');
+                hideUpdateTeacherModal();
+                // Refresh the view class modal if it's open
+                if (document.getElementById('viewClassModal').classList.contains('active')) {
+                    const currentClassId = document.getElementById('assignClassId').value || document.getElementById('updateClassId').value;
+                    if (currentClassId) {
+                        viewClassDetails(currentClassId);
+                    }
+                }
+            } else {
+                throw new Error(data.error || data.message || 'Failed to update teacher assignment');
+            }
+        } catch (error) {
+            console.error('Error updating teacher assignment:', error);
+            showClassStatus('❌ Failed to update teacher assignment: ' + error.message, 'error');
+        }
+    }
+
+    // Delete teacher assignment
+    async function deleteTeacherAssignment() {
+        const assignmentId = document.getElementById('updateAssignmentId').value;
+        const teacherName = document.getElementById('updateTeacherName').value;
+        const className = document.getElementById('updateClassName').value;
+
+        if (!assignmentId) {
+            alert('Missing assignment ID');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to remove ${teacherName} from ${className}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/class-teachers/${assignmentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showClassStatus(`✅ Teacher removed from class successfully`, 'success');
+                hideUpdateTeacherModal();
+                // Refresh the view class modal if it's open
+                if (document.getElementById('viewClassModal').classList.contains('active')) {
+                    const currentClassId = document.getElementById('assignClassId').value || document.getElementById('updateClassId').value;
+                    if (currentClassId) {
+                        viewClassDetails(currentClassId);
+                    }
+                }
+                loadClassesData(); // Reload classes
+            } else {
+                throw new Error(data.error || data.message || 'Failed to remove teacher');
+            }
+        } catch (error) {
+            console.error('Error deleting teacher assignment:', error);
+            showClassStatus('❌ Failed to remove teacher: ' + error.message, 'error');
+        }
+    }
+
+    // View class details
+    async function viewClassDetails(classId) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/classes/${classId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const classInfo = data.class;
+                const students = data.students || [];
+                const teachers = data.teachers || [];
+                
+                let html = `
+                    <h4>${classInfo.class_name}</h4>
+                    <p><strong>Class Code:</strong> ${classInfo.class_code}</p>
+                    <p><strong>Faculty:</strong> ${classInfo.faculty || 'N/A'}</p>
+                    <p><strong>Department:</strong> ${classInfo.department || 'N/A'}</p>
+                    <p><strong>Stream:</strong> ${classInfo.stream || 'N/A'}</p>
+                    <p><strong>Division:</strong> ${classInfo.division || 'N/A'}</p>
+                    <p><strong>Semester:</strong> ${classInfo.semester || 'N/A'}</p>
+                    <p><strong>Academic Year:</strong> ${classInfo.academic_year || 'N/A'}</p>
+                    <p><strong>Subjects:</strong> ${classInfo.subjects || 'N/A'}</p>
+                    <p><strong>Total Students:</strong> ${classInfo.student_count || 0}</p>
+                    <p><strong>Total Teachers:</strong> ${classInfo.teacher_count || 0}</p>
+                    
+                    <h5 style="margin-top: 20px;">Assigned Teachers:</h5>
+                `;
+                
+                if (teachers.length > 0) {
+                    html += `
+                        <table class="class-teachers-table">
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Subjects</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    teachers.forEach(teacher => {
+                        html += `
+                            <tr>
+                                <td>${teacher.name} (${teacher.teacher_code})</td>
+                                <td>${teacher.subjects}</td>
+                                <td>${teacher.is_primary ? '<span class="teacher-assignment-badge primary">Primary</span>' : '<span class="teacher-assignment-badge">Regular</span>'}</td>
+                                <td class="actions-cell">
+                                    <button class="action-btn edit-btn" title="Edit" onclick="showUpdateTeacherModal(${teacher.assignment_id}, ${classId}, '${classInfo.class_name}', ${teacher.id}, '${teacher.name}', '${teacher.subjects}', ${teacher.is_primary})">
+                                        <i class="fa-solid fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete-btn" title="Remove" onclick="deleteTeacherAssignmentDirect(${teacher.assignment_id}, '${teacher.name}', '${classInfo.class_name}')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    html += '<p>No teachers assigned yet.</p>';
+                }
+                
+                html += `<h5 style="margin-top: 20px;">Enrolled Students: ${students.length}</h5>`;
+                
+                if (students.length > 0) {
+                    html += '<ul>';
+                    students.slice(0, 10).forEach(student => {
+                        html += `<li>${student.name} (${student.student_code}) - Roll No: ${student.roll_no}</li>`;
+                    });
+                    if (students.length > 10) {
+                        html += `<li>... and ${students.length - 10} more students</li>`;
+                    }
+                    html += '</ul>';
+                }
+                
+                document.getElementById('classDetailsContent').innerHTML = html;
+                document.getElementById('viewClassModal').classList.add('active');
+            }
+        } catch (error) {
+            console.error('Error loading class details:', error);
+            alert('Failed to load class details');
+        }
+    }
+
+    // Delete teacher assignment directly from view modal
+    async function deleteTeacherAssignmentDirect(assignmentId, teacherName, className) {
+        if (!confirm(`Are you sure you want to remove ${teacherName} from ${className}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/class-teachers/${assignmentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showClassStatus(`✅ Teacher removed from class successfully`, 'success');
+                // Refresh the view class modal
+                const currentClassId = document.getElementById('assignClassId').value || document.getElementById('updateClassId').value;
+                if (currentClassId) {
+                    viewClassDetails(currentClassId);
+                }
+                loadClassesData(); // Reload classes
+            } else {
+                throw new Error(data.error || data.message || 'Failed to remove teacher');
+            }
+        } catch (error) {
+            console.error('Error deleting teacher assignment:', error);
+            showClassStatus('❌ Failed to remove teacher: ' + error.message, 'error');
+        }
+    }
+
+    function hideViewClassModal() {
+        document.getElementById('viewClassModal').classList.remove('active');
+    }
+
+    // Delete class
+    async function deleteClass(classId, className) {
+        if (!confirm(`Are you sure you want to delete class "${className}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/classes/${classId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showClassStatus(`✅ ${data.message}`, 'success');
+                loadClassesData(); // Reload classes
+            } else {
+                throw new Error(data.error || data.message || 'Failed to delete class');
+            }
+        } catch (error) {
+            console.error('Error deleting class:', error);
+            showClassStatus('❌ Failed to delete class: ' + error.message, 'error');
+        }
+    }
+
+    // ================= CSV PARSERS =================
+    // Teacher CSV parser
+    function parseCSV(csvText) {
+        console.log("Starting CSV parsing...");
+        
+        // Normalize line endings
+        csvText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+        
+        const lines = csvText.split('\n');
+        console.log(`Total lines: ${lines.length}`);
+        
+        if (lines.length < 2) {
+            console.error("CSV has less than 2 lines (need headers + at least 1 data row)");
+            return [];
+        }
+        
+        // Parse headers
+        const headerLine = lines[0];
+        const headers = parseSimpleCSVLine(headerLine);
+        console.log("Headers:", headers);
+        
+        // Map headers to lowercase for consistency
+        const headerMap = {};
+        headers.forEach((h, i) => {
+            const normalized = h.trim().toLowerCase();
+            // Map common variations to standard names
+            if (normalized.includes('teacher') && normalized.includes('code')) {
+                headerMap[i] = 'teacher_code';
+            } else if (normalized.includes('name')) {
+                headerMap[i] = 'name';
+            } else if (normalized.includes('email')) {
+                headerMap[i] = 'email';
+            } else if (normalized.includes('mobile') || normalized.includes('phone')) {
+                headerMap[i] = 'mobile';
+            } else if (normalized.includes('faculty')) {
+                headerMap[i] = 'faculty';
+            } else if (normalized.includes('department') || normalized.includes('dept')) {
+                headerMap[i] = 'department';
+            } else if (normalized.includes('subject')) {
+                headerMap[i] = 'subjects';
+            } else {
+                headerMap[i] = normalized;
+            }
+        });
+        
+        console.log("Header mapping:", headerMap);
+        
+        // Parse data rows
+        const rows = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            
+            const values = parseSimpleCSVLine(line);
+            console.log(`Line ${i} values:`, values);
+            
+            if (values.length === 0) continue;
+            
+            const row = {};
+            
+            // Map values to headers
+            Object.keys(headerMap).forEach(index => {
+                const idx = parseInt(index);
+                if (idx < values.length) {
+                    row[headerMap[idx]] = values[idx].trim();
+                }
+            });
+            
+            console.log(`Row ${i} parsed:`, row);
+            
+            // Only add row if it has teacher_code or email
+            if (row.teacher_code || row.email) {
+                rows.push(row);
+            }
+        }
+        
+        console.log(`Successfully parsed ${rows.length} rows`);
+        return rows;
+    }
+
+    // Student CSV parser
+    function parseStudentCSV(csvText) {
+        console.log("Starting Student CSV parsing...");
+        
+        // Normalize line endings
+        csvText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+        
+        const lines = csvText.split('\n');
+        console.log(`Total lines: ${lines.length}`);
+        
+        if (lines.length < 2) {
+            console.error("CSV has less than 2 lines (need headers + at least 1 data row)");
+            return [];
+        }
+        
+        // Parse headers
+        const headerLine = lines[0];
+        const headers = parseSimpleCSVLine(headerLine);
+        console.log("Student Headers:", headers);
+        
+        // Map headers to lowercase for consistency
+        const headerMap = {};
+        headers.forEach((h, i) => {
+            const normalized = h.trim().toLowerCase();
+            if (normalized.includes('roll') && (normalized.includes('no') || normalized.includes('number') || normalized.includes('num'))) {
+                headerMap[i] = 'roll_no';
+            } else if (normalized.includes('name')) {
+                headerMap[i] = 'name';
+            } else if (normalized.includes('email')) {
+                headerMap[i] = 'email';
+            } else if (normalized.includes('mobile') || normalized.includes('phone') || normalized.includes('contact')) {
+                headerMap[i] = 'mobile';
+            } else if (normalized.includes('faculty')) {
+                headerMap[i] = 'faculty';
+            } else if (normalized.includes('department') || normalized.includes('dept')) {
+                headerMap[i] = 'department';
+            } else if (normalized.includes('stream')) {
+                headerMap[i] = 'stream';
+            } else if (normalized.includes('division') || normalized.includes('div')) {
+                headerMap[i] = 'division';
+            } else if (normalized.includes('semester') || normalized.includes('sem')) {
+                headerMap[i] = 'semester';
+            } else if ((normalized.includes('academic') && normalized.includes('year')) || normalized.includes('acadyear') || normalized.includes('year')) {
+                headerMap[i] = 'academic_year';
+            } else if (normalized.includes('subject')) {
+                headerMap[i] = 'subjects';
+            } else {
+                // For any other headers, just pass them through
+                headerMap[i] = normalized;
+            }
+        });
+        
+        console.log("Student Header mapping:", headerMap);
+        
+        // Parse data rows
+        const rows = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            
+            const values = parseSimpleCSVLine(line);
+            console.log(`Student Line ${i} values:`, values);
+            
+            if (values.length === 0) continue;
+            
+            const row = {};
+            
+            // Map values to headers
+            Object.keys(headerMap).forEach(index => {
+                const idx = parseInt(index);
+                if (idx < values.length) {
+                    row[headerMap[idx]] = values[idx].trim();
+                }
+            });
+            
+            console.log(`Student Row ${i} parsed:`, row);
+            
+            if (row.roll_no || row.email) {
+                rows.push(row);
+            }
+        }
+        
+        console.log(`Successfully parsed ${rows.length} student rows`);
+        return rows;
+    }
+
+    // Simple CSV line parser (handles quoted fields)
+    function parseSimpleCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = i + 1 < line.length ? line[i + 1] : '';
+            
+            if (char === '"') {
+                if (inQuotes && nextChar === '"') {
+                    // Escaped quote
+                    current += '"';
+                    i++; // Skip next quote
+                } else {
+                    // Start or end quotes
+                    inQuotes = !inQuotes;
+                }
+            } else if (char === ',' && !inQuotes) {
+                // End of field
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        // Add the last field
+        result.push(current);
+        
+        // Remove surrounding quotes from each field
+        return result.map(field => {
+            field = field.trim();
+            if (field.startsWith('"') && field.endsWith('"')) {
+                field = field.substring(1, field.length - 1);
+            }
+            return field;
+        });
+    }
+
+    // ================= THEME =================
+    function toggleTheme() {
+        const body = document.body;
+        const themeIcon = document.getElementById('themeIcon');
+
+        body.classList.toggle('dark-theme');
+
+        if (body.classList.contains('dark-theme')) {
+            themeIcon.className = 'fa-solid fa-sun';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            themeIcon.className = 'fa-solid fa-moon';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const savedTheme = localStorage.getItem('theme');
+        const themeIcon = document.getElementById('themeIcon');
+
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeIcon.className = 'fa-solid fa-sun';
+        }
+
+        // Add click outside to close sidebar on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.fa-bars');
+
+            if (
+                window.innerWidth <= 768 &&
+                sidebar.classList.contains('mobile-show') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)
+            ) {
+                hideMobileSidebar();
+            }
+        });
+    });
+
+    // ================= SIDEBAR =================
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const mobileOverlay = document.getElementById("mobileSidebarOverlay");
+
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle("mobile-show");
+            mobileOverlay.classList.toggle("active");
+        } else {
+            sidebar.classList.toggle("collapsed");
+        }
+    }
+
+    function hideMobileSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const mobileOverlay = document.getElementById("mobileSidebarOverlay");
+
+        sidebar.classList.remove("mobile-show");
+        mobileOverlay.classList.remove("active");
+    }
+
+    // ================= PROFILE =================
+    function toggleDropdown() {
+        document.getElementById("dropdown").classList.toggle("active");
+    }
+
+    document.addEventListener('click', function (event) {
+        const dropdown = document.getElementById("dropdown");
+        const profile = document.querySelector('.profile');
+
+        if (dropdown.classList.contains('active') && !profile.contains(event.target)) {
+            dropdown.classList.remove('active');
+        }
+    });
+
+    // ================= FULLSCREEN =================
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log(`Error enabling fullscreen: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    // ================= LOGOUT =================
+    function logout(force = false) {
+        if (force || confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("adminEmail");
+            localStorage.removeItem("adminName");
+            window.location.href = "login.html";
+        }
+    }
+
+    // ================= BLOCK BACK BUTTON =================
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+        window.history.pushState(null, "", window.location.href);
+    };
+</script>
+</body>
+</html>
